@@ -1,0 +1,29 @@
+use_default_settings: true
+
+general:
+  debug: false
+  instance_name: "SearXNG"
+
+search:
+  safe_search: 2
+  autocomplete: 'duckduckgo'
+  formats:
+    - html
+    - json
+
+server:
+  # Is overwritten by ${SEARXNG_SECRET}
+  secret_key: "8f3eac4e1e1f4b82a121762e693e75d2457992d8cfe23f00312ad7d8fcde0947"
+  limiter: false
+  image_proxy: true
+
+outgoing:
+  request_timeout: 3.0
+  useragent_suffix: ""
+
+botdetection:
+  ip_limit:
+    filter_link_local: false
+
+valkey:
+  url: valkey://valkey:6379/0

@@ -1,0 +1,32 @@
+# engines.yml
+- name: duckduckgo
+  engine: duckduckgo
+  shortcut: ddg
+
+- name: brave
+  engine: brave
+  shortcut: br
+
+- name: qwant
+  engine: qwant
+  shortcut: qw
+  qwant_categ: web
+
+- name: wikipedia
+  engine: wikipedia
+  shortcut: wp
+
+- name: wikidata
+  engine: wikidata
+  shortcut: wd
+  disabled: true
+
+- name: google
+  engine: google
+  shortcut: g
+  disabled: true
+
+- name: bing
+  engine: bing
+  shortcut: b
+  disabled: true

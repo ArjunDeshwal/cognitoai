@@ -1,0 +1,5 @@
+pymilvus
+langchain
+langchain-community
+langchain-core
+langchain-openai
