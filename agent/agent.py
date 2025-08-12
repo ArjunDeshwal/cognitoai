@@ -14,19 +14,18 @@ from tools.weather import get_weather
 from kittentts import KittenTTS
 import sounddevice as sd
 
-# 'if-token-present' means nothing will be sent (and the example will work) if you don't have logfire configured
-# logfire.configure(send_to_logfire='if-token-present')
-# logfire.instrument_pydantic_ai()
+logfire.configure(send_to_logfire='if-token-present')
+logfire.instrument_pydantic_ai()
 # Initialize console for pretty output
 console = Console()
 
 # Initialize Ollama
 llm = OpenAIModel(
-    model_name="qwen3:1.7b", provider=OpenAIProvider(base_url="http://localhost:11434/v1")
+    model_name="qwen3:4b", provider=OpenAIProvider(base_url="http://localhost:11434/v1")
 )
 
 # Create memory
-async def limit_tokens(messages: list[ModelMessage], max_tokens: int = 15000) -> list[ModelMessage]:
+async def limit_tokens(messages: list[ModelMessage], max_tokens: int = 10000) -> list[ModelMessage]:
     """Keep messages within token limit (rough estimation)."""
     total_tokens = 0
     kept_messages = []
@@ -47,13 +46,13 @@ tools = [search_web, get_weather]
 # Create agent
 agent = Agent(model=llm, history_processors=[limit_tokens], 
               tools=tools, 
-              system_prompt="""You are Vani, a local AI-assistant. You have to help the user in general tasks. For the things that you don't know Try to use the web_search tool. Don't answer to inappropriate questions though. Avoid using emojis. Use the get_weather to get the weather of a location.""",
+              system_prompt="""You are Vani, a local AI-assistant. You have to help the user in general tasks. For the things that you don't know, use the web_search tool. Avoid using emojis. Use the get_weather to get the weather of a location.""",
               
               )
 m = KittenTTS("KittenML/kitten-tts-nano-0.1")
 # Main chat loop
 async def main():
-    console.print("[bold green]Jarvis Started![/bold green]")
+    console.print("[bold green]Vani Started![/bold green]")
     console.print("Type 'exit' to quit\n")
     conversation_history:list[ModelMessage]=[]
     mute=False
@@ -73,7 +72,7 @@ async def main():
                 response = await agent.run(user_input, message_history=conversation_history, deps=deps)
                 conversation_history.extend(response.new_messages())
                 # Display response
-                console.print("\n[bold green]Jarvis:[/bold green]")
+                console.print("\n[bold green]Vani:[/bold green]")
                 console.print(Markdown(response.output))
                 if not mute:
                     audio=m.generate(response.output, voice='expr-voice-4-f')
