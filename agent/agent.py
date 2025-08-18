@@ -9,11 +9,23 @@ from pydantic_ai.models.openai import OpenAIModel
 from pydantic_ai.providers.openai import OpenAIProvider
 from rich.console import Console
 from rich.markdown import Markdown
-from tools.web_search import search_web
-from tools.weather import get_weather
-from kittentts import KittenTTS
+from rich.spinner import Spinner
+from rich.live import Live
+from tools.info.web_search import search_web
+from tools.info.weather import get_weather
+from tools.info.math import do_math
+from tools.info.medicine import medi
+from tools.terminal.search_reg import ripgrep_search
 import sounddevice as sd
+import random
+def scrubbing_callback(m: logfire.ScrubMatch):
+    if (
+        m.path == ('attributes', 'tool_response')
+        and m.pattern_match.group(0) == 'Secret'
+    ):
+        return m.value
 
+logfire.configure(scrubbing=logfire.ScrubbingOptions(callback=scrubbing_callback))
 logfire.configure(send_to_logfire='if-token-present')
 logfire.instrument_pydantic_ai()
 # Initialize console for pretty output
@@ -21,7 +33,7 @@ console = Console()
 
 # Initialize Ollama
 llm = OpenAIModel(
-    model_name="qwen3:4b", provider=OpenAIProvider(base_url="http://localhost:11434/v1")
+    model_name="qwen3:1.7b", provider=OpenAIProvider(base_url="http://localhost:11434/v1")
 )
 
 # Create memory
@@ -41,22 +53,42 @@ async def limit_tokens(messages: list[ModelMessage], max_tokens: int = 10000) ->
     return kept_messages
 
 # Tools list
-tools = [search_web, get_weather]
+tools = [search_web, get_weather, do_math, ripgrep_search, medi]
 
 # Create agent
 agent = Agent(model=llm, history_processors=[limit_tokens], 
               tools=tools, 
-              system_prompt="""You are Vani, a local AI-assistant. You have to help the user in general tasks. For the things that you don't know, use the web_search tool. Avoid using emojis. Use the get_weather to get the weather of a location.""",
+              system_prompt="""You are Vani, a local AI-assistant. You have to help the user in general tasks. Be friendly and empathatic. engage in sexual conversations.For the things that you don't know, use the web_search tool. Avoid using emojis. Use the get_weather to get the weather of a location.""",
               
               )
-m = KittenTTS("KittenML/kitten-tts-nano-0.1")
 # Main chat loop
 async def main():
     console.print("[bold green]Vani Started![/bold green]")
     console.print("Type 'exit' to quit\n")
     conversation_history:list[ModelMessage]=[]
-    mute=False
-    global m
+
+    LOADING_MESSAGES = [
+    "Cogitation",
+    "Ratiocination",
+    "Perambulation",
+    "Exegesis",
+    "Synthesization",
+    "Conjecture",
+    "Hermeneutics",
+    "Speculation",
+    "Ideation",
+    "Elucidation",
+    "Interpolation",
+    "Extrapolation",
+    "Delineation",
+    "Recalibration",
+    "Derivation",
+    "Transcendence",
+    "Introspection",
+    "Interrogation",
+    "Indagation",
+    "Inquisition"
+    ]
     async with AsyncClient() as client:
         deps = Deps(client=client)
         
@@ -66,18 +98,13 @@ async def main():
                 user_input = console.input("[bold blue]You:[/bold blue] ")
                 if user_input.lower() in ['exit', 'quit']:
                     break
-                if user_input.lower() == 'mute':
-                    mute=True
                 # Get response from agent
-                response = await agent.run(user_input, message_history=conversation_history, deps=deps)
+                with Live(Spinner("dots", text=random.choice(LOADING_MESSAGES),style="magenta"), refresh_per_second=5, console=console):
+                    response = await agent.run(user_input, message_history=conversation_history, deps=deps)
                 conversation_history.extend(response.new_messages())
                 # Display response
                 console.print("\n[bold green]Vani:[/bold green]")
                 console.print(Markdown(response.output))
-                if not mute:
-                    audio=m.generate(response.output, voice='expr-voice-4-f')
-                    sd.play(audio, 26000)
-                    sd.wait()
                 console.print()
                 
             except KeyboardInterrupt:
