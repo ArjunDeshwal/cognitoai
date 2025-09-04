@@ -1,7 +1,4 @@
-from pydantic import BaseModel
-from pydantic_ai import RunContext
 import subprocess
-
 
 def ripgrep_search(pattern: str, folder: str = ".") -> str:
     """

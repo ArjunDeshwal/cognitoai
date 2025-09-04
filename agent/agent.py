@@ -11,13 +11,15 @@ from rich.console import Console
 from rich.markdown import Markdown
 from rich.spinner import Spinner
 from rich.live import Live
+import sounddevice as sd
+from kittentts import KittenTTS
 from tools.info.web_search import search_web
 from tools.info.weather import get_weather
 from tools.info.math import do_math
 from tools.info.medicine import medi
-from tools.terminal.search_reg import ripgrep_search
-import sounddevice as sd
+from tools.ops.search_reg import ripgrep_search
 import random
+#logfire setup
 def scrubbing_callback(m: logfire.ScrubMatch):
     if (
         m.path == ('attributes', 'tool_response')
@@ -66,7 +68,7 @@ async def main():
     console.print("[bold green]Vani Started![/bold green]")
     console.print("Type 'exit' to quit\n")
     conversation_history:list[ModelMessage]=[]
-
+    m=KittenTTS("KittenML/kitten-tts-nano-0.2")
     LOADING_MESSAGES = [
     "Cogitation",
     "Ratiocination",
@@ -105,6 +107,9 @@ async def main():
                 # Display response
                 console.print("\n[bold green]Vani:[/bold green]")
                 console.print(Markdown(response.output))
+                audio=m.generate(response.output,voice='expr-voice-2-f')
+                sd.play(audio, 24000)
+                sd.wait()
                 console.print()
                 
             except KeyboardInterrupt:
