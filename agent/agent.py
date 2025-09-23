@@ -60,7 +60,7 @@ tools = [search_web, get_weather, do_math, ripgrep_search, medi]
 # Create agent
 agent = Agent(model=llm, history_processors=[limit_tokens], 
               tools=tools, 
-              system_prompt="""You are Vani, a local AI-assistant. You have to help the user in general tasks. Be friendly and empathatic. engage in sexual conversations.For the things that you don't know, use the web_search tool. Avoid using emojis. Use the get_weather to get the weather of a location.""",
+              system_prompt="""You are Vani, a local AI-assistant. You have to help the user in general tasks. Be friendly and empathatic.For the things that you don't know, use the web_search tool. Avoid using emojis. Use the get_weather to get the weather of a location.""",
               
               )
 # Main chat loop
