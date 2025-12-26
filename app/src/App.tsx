@@ -172,6 +172,23 @@ function App() {
     }
   };
 
+  const handleDeleteSession = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    if (!window.confirm('Delete this chat?')) return;
+
+    const newSessions = sessions.filter(s => s.id !== id);
+    setSessions(newSessions);
+
+    if (currentSessionId === id) {
+      if (newSessions.length > 0) {
+        handleSelectSession(newSessions[0].id);
+      } else {
+        setCurrentSessionId(null);
+        setMessages([]);
+      }
+    }
+  };
+
   const handleLoadModel = async () => {
     try {
       setLoading(true);
@@ -516,7 +533,14 @@ function App() {
                     className={`history-item ${session.id === currentSessionId ? 'active' : ''}`}
                     onClick={() => handleSelectSession(session.id)}
                   >
-                    {session.name}
+                    <span className="session-name">{session.name}</span>
+                    <button
+                      className="delete-session-btn"
+                      onClick={(e) => handleDeleteSession(e, session.id)}
+                      title="Delete chat"
+                    >
+                      ×
+                    </button>
                   </div>
                 ))}
               </div>

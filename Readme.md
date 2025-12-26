@@ -56,8 +56,8 @@ A fully local AI assistant that runs on your machine. No cloud, no data collecti
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/cognito.git
-   cd cognito
+   git clone https://github.com/ArjunDeshwal/cognitoai.git
+   cd cognitoai
    ```
 
 2. **Set up Python backend**
@@ -112,7 +112,7 @@ cognito/
 
 ## 🤝 Contributing
 
-We welcome contributions! Here's how to get started:
+Open source on [GitHub](https://github.com/ArjunDeshwal/cognitoai) ·
 
 ### Development Setup
 
@@ -156,7 +156,7 @@ When reporting bugs, please include:
 
 ## 📜 License
 
-MIT License - see [LICENSE](./LICENSE) for details.
+MIT License - see [LICENSE](https://github.com/ArjunDeshwal/cognitoai/blob/main/LICENSE) for details.
 
 ---
 
@@ -170,4 +170,3 @@ MIT License - see [LICENSE](./LICENSE) for details.
 <p align="center">
   <b>Built with ❤️ for privacy</b>
 </p>
-# cognitoai

@@ -229,11 +229,45 @@
   color: var(--text-secondary);
   font-size: 0.9rem;
   cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.session-name {
+  flex: 1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.delete-session-btn {
+  opacity: 0;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  line-height: 1;
   transition: all 0.2s;
-  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  margin-left: 8px;
+}
+
+.history-item:hover .delete-session-btn {
+  opacity: 0.6;
+}
+
+.delete-session-btn:hover {
+  color: #ef4444 !important;
+  opacity: 1 !important;
+  transform: scale(1.1);
 }
 
 .history-item:hover {

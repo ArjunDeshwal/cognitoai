@@ -318,8 +318,8 @@
         </div>
         <div class="nav-links">
             <a href="#features">Features</a>
-            <a href="https://github.com/yourusername/cognito">GitHub</a>
-            <a href="https://github.com/yourusername/cognito/releases">Releases</a>
+            <a href="https://github.com/ArjunDeshwal/cognitoai">GitHub</a>
+            <a href="https://github.com/ArjunDeshwal/cognitoai/releases">Releases</a>
         </div>
     </nav>
 
@@ -344,24 +344,21 @@
             </a>
 
             <div class="other-downloads">
-                <a href="https://github.com/yourusername/cognito/releases/latest/download/Cognito-1.0.0-arm64.dmg">macOS
+                <a href="https://github.com/ArjunDeshwal/cognitoai/releases/latest/download/Cognito-1.0.0-arm64.dmg">macOS
                     (Apple Silicon)</a>
-                <a href="https://github.com/yourusername/cognito/releases/latest/download/Cognito-1.0.0.dmg">macOS
+                <a href="https://github.com/ArjunDeshwal/cognitoai/releases/latest/download/Cognito-1.0.0.dmg">macOS
                     (Intel)</a>
                 <a
-                    href="https://github.com/yourusername/cognito/releases/latest/download/Cognito-Setup-1.0.0.exe">Windows</a>
+                    href="https://github.com/ArjunDeshwal/cognitoai/releases/latest/download/Cognito-Setup-1.0.0.exe">Windows</a>
                 <a
-                    href="https://github.com/yourusername/cognito/releases/latest/download/Cognito-1.0.0.AppImage">Linux</a>
+                    href="https://github.com/ArjunDeshwal/cognitoai/releases/latest/download/Cognito-1.0.0.AppImage">Linux</a>
             </div>
 
             <p class="version">Version 1.0.0 · Requires Python 3.10+</p>
         </div>
 
         <div class="screenshot-container">
-            <div class="screenshot-placeholder">
-                <span>App Screenshot</span>
-            </div>
-            <!-- Replace with actual screenshot: <img src="screenshot.png" alt="Cognito Screenshot"> -->
+            <img src="screenshot.png" alt="Cognito Screenshot">
         </div>
     </section>
 
@@ -405,7 +402,7 @@
 
     <footer>
         <p>
-            Open source on <a href="https://github.com/yourusername/cognito">GitHub</a> ·
+            Open source on <a href="https://github.com/ArjunDeshwal/cognitoai">GitHub</a> ·
             Built with ❤️ for privacy
         </p>
     </footer>
@@ -421,17 +418,17 @@
         if (platform.includes('mac') || platform.includes('darwin')) {
             // Check for Apple Silicon
             if (userAgent.includes('arm') || (navigator.userAgentData && navigator.userAgentData.platform === 'macOS')) {
-                mainDownload.href = 'https://github.com/yourusername/cognito/releases/latest/download/Cognito-1.0.0-arm64.dmg';
+                mainDownload.href = 'https://github.com/ArjunDeshwal/cognitoai/releases/latest/download/Cognito-1.0.0-arm64.dmg';
                 downloadText.textContent = 'Download for Mac (Apple Silicon)';
             } else {
-                mainDownload.href = 'https://github.com/yourusername/cognito/releases/latest/download/Cognito-1.0.0.dmg';
+                mainDownload.href = 'https://github.com/ArjunDeshwal/cognitoai/releases/latest/download/Cognito-1.0.0.dmg';
                 downloadText.textContent = 'Download for Mac (Intel)';
             }
         } else if (platform.includes('win')) {
-            mainDownload.href = 'https://github.com/yourusername/cognito/releases/latest/download/Cognito-Setup-1.0.0.exe';
+            mainDownload.href = 'https://github.com/ArjunDeshwal/cognitoai/releases/latest/download/Cognito-Setup-1.0.0.exe';
             downloadText.textContent = 'Download for Windows';
         } else if (platform.includes('linux')) {
-            mainDownload.href = 'https://github.com/yourusername/cognito/releases/latest/download/Cognito-1.0.0.AppImage';
+            mainDownload.href = 'https://github.com/ArjunDeshwal/cognitoai/releases/latest/download/Cognito-1.0.0.AppImage';
             downloadText.textContent = 'Download for Linux';
         }
     </script>
