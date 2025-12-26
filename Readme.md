@@ -83,13 +83,6 @@ A fully local AI assistant that runs on your machine. No cloud, no data collecti
    - Browse and download a GGUF model
    - Select it to start chatting!
 
-### Recommended Models
-| Model | Size | Best For |
-|-------|------|----------|
-| Qwen2.5-3B-Instruct | ~2GB | Fast responses, good quality |
-| Mistral-7B-Instruct | ~4GB | Balanced performance |
-| Llama-3.1-8B-Instruct | ~5GB | Best quality |
-
 ---
 
 ## 📁 Project Structure
