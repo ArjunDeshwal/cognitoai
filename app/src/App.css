@@ -796,6 +796,18 @@ button:hover {
   cursor: not-allowed;
 }
 
+.send-btn.stopping {
+  background: #8b5cf6;
+  color: white;
+}
+
+.stop-icon {
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 
 /* Scrollbar */
 ::-webkit-scrollbar {

@@ -10,5 +10,10 @@ httpx
 pymupdf>=1.24.0
 scikit-learn>=1.3.0
 
-# Web search
+# Web search & Tools
 faiss-cpu
+sentence-transformers
+langchain-text-splitters
+aiohttp
+beautifulsoup4
+numpy

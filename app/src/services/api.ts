@@ -50,13 +50,15 @@ export async function chatCompletionStream(
     onDone: () => void,
     onError: (error: string) => void,
     deepSearch: boolean = false,
-    useDocuments: boolean = false
+    useDocuments: boolean = false,
+    signal?: AbortSignal
 ): Promise<void> {
     try {
         const res = await fetch(`${API_URL}/v1/chat/completions`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ messages, stream: true, deep_search: deepSearch, use_documents: useDocuments }),
+            signal
         });
 
         if (!res.ok) {
@@ -116,6 +118,10 @@ export async function chatCompletionStream(
             }
         }
     } catch (e: any) {
+        if (e.name === 'AbortError') {
+            onDone(); // Silence error on abort
+            return;
+        }
         onError(e.toString());
     }
 }

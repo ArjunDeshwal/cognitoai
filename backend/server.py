@@ -89,18 +89,30 @@ def get_tool_system_prompt() -> str:
     System prompt that tells the model it can request a web search.
     The model decides when to search - it outputs [SEARCH: query] to trigger search.
     """
-    return """You have access to web search. If you need current information, facts you're unsure about, or the user asks about recent events/news/prices/data, you can search.
+    return """# INSTRUCTION: Agentic Search Capability
 
-To search, output EXACTLY this format:
-[SEARCH: your search query here]
+You are an AI assistant with access to a REAL-TIME WEB SEARCH tool. 
 
-Be encouraged to search when:
-- You're unsure about facts
-- Current/recent information needed
-- Prices, stats, news requested  
-- Want to verify knowledge
+## WHEN TO SEARCH
+- If the user asks for news, current events, or recent developments (today, this week, 2024, 2025 etc).
+- If you need to verify facts, dates, or technical data of which you are unsure.
+- If the user explicitly asks you to search.
+- When asked about a specific person, product, or company that might have recent updates.
 
-Skip search for: general knowledge you're confident about, creative tasks, greetings."""
+## HOW TO SEARCH
+To trigger a search, you MUST output a specific command at the VERY BEGINNING of your response. 
+Format: [SEARCH: your search query here]
+
+Example:
+User: "What is the price of Bitcoin right now?"
+Assistant: [SEARCH: current price of Bitcoin in USD]
+
+## IMPORTANT
+1. You MUST use the exact format: [SEARCH: ...]
+2. Once you output the search command, the system will provide the search results.
+3. Your search query should be concise and optimized for a search engine.
+4. If a search is needed, do NOT attempt to answer until you have search results.
+"""
 
 
 def parse_search_request(text: str) -> tuple[bool, str]:
@@ -213,7 +225,14 @@ async def generate_stream_with_search(
     # Add tool system prompt if tools available
     if TOOLS_AVAILABLE:
         tool_prompt = get_tool_system_prompt()
-        messages_payload.insert(0, {"role": "system", "content": tool_prompt})
+        # Find index of last system message to insert after it, or insert at 0
+        insert_idx = 0
+        for i, msg in enumerate(messages_payload):
+            if msg['role'] == 'system':
+                insert_idx = i + 1
+            else:
+                break # Stop at first non-system message
+        messages_payload.insert(insert_idx, {"role": "system", "content": tool_prompt})
     
     yield f"data: {json.dumps({'status': 'generating'})}\n\n"
     
@@ -252,6 +271,7 @@ async def generate_stream_with_search(
         
         # If model requested search, do it and continue
         if search_requested and TOOLS_AVAILABLE:
+            print(f"[Search] Model requested search: {search_query_from_model}")
             yield f"data: {json.dumps({'status': 'searching', 'query': search_query_from_model})}\n\n"
             
             try:
@@ -320,7 +340,13 @@ async def chat_completions(request: ChatCompletionRequest):
         # Non-streaming: Add tool prompt and let model decide
         if TOOLS_AVAILABLE:
             tool_prompt = get_tool_system_prompt()
-            messages_payload.insert(0, {"role": "system", "content": tool_prompt})
+            insert_idx = 0
+            for i, msg in enumerate(messages_payload):
+                if msg['role'] == 'system':
+                    insert_idx = i + 1
+                else:
+                    break
+            messages_payload.insert(insert_idx, {"role": "system", "content": tool_prompt})
         
         try:
             output = await asyncio.to_thread(

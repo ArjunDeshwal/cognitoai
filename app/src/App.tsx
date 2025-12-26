@@ -102,6 +102,7 @@ function App() {
   const [showOptionsMenu, setShowOptionsMenu] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -253,6 +254,15 @@ function App() {
     setShowSystemPrompt(false);
   };
 
+  const handleStop = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+      setLoading(false);
+      setStreamStatus(null);
+    }
+  };
+
   const handleSend = async () => {
     if (!input.trim()) return;
 
@@ -283,6 +293,9 @@ function App() {
     // Determine if we should use document context
     const useDocuments = uploadedDocuments.length > 0;
 
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     try {
       await chatCompletionStream(
         messagesToSend,
@@ -308,6 +321,7 @@ function App() {
         () => {
           setLoading(false);
           setStreamStatus(null);
+          abortControllerRef.current = null;
         },
         // onError
         (error) => {
@@ -319,9 +333,11 @@ function App() {
           }
           setLoading(false);
           setStreamStatus(null);
+          abortControllerRef.current = null;
         },
         deepSearchEnabled,  // Pass deep search flag
-        useDocuments  // Pass document RAG flag
+        useDocuments,  // Pass document RAG flag
+        controller.signal
       );
     } catch (e: any) {
       alert('Error: ' + e.toString());
@@ -623,17 +639,26 @@ function App() {
                     type="text"
                     placeholder={uploadedDocuments.length > 0 ? "Ask about your document..." : (deepSearchEnabled ? "Deep search enabled..." : "Type a message...")}
                     value={input}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                    onKeyDown={(e) => e.key === 'Enter' && !loading && handleSend()}
                     onChange={(e) => setInput(e.target.value)}
-                    disabled={loading}
                   />
-                  <button
-                    className="send-btn"
-                    onClick={handleSend}
-                    disabled={loading || !input.trim()}
-                  >
-                    ↑
-                  </button>
+                  {loading ? (
+                    <button
+                      className="send-btn stopping"
+                      onClick={handleStop}
+                      title="Stop generating"
+                    >
+                      <span className="stop-icon">■</span>
+                    </button>
+                  ) : (
+                    <button
+                      className="send-btn"
+                      onClick={handleSend}
+                      disabled={!input.trim()}
+                    >
+                      ↑
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
