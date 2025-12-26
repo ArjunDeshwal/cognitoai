@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cognito - Private. Local. Fast.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #111118;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent: #8b5cf6;
+            --accent-glow: rgba(139, 92, 246, 0.3);
+        }
+
+        body {
+            font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Gradient background */
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+                var(--bg-primary);
+            z-index: -1;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(20px);
+            background: rgba(10, 10, 15, 0.8);
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+        }
+
+        .hero-logo {
+            width: 160px;
+            height: 160px;
+            margin-bottom: 24px;
+            border-radius: 32px;
+            box-shadow: 0 12px 48px rgba(139, 92, 246, 0.4);
+            object-fit: cover;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 120px 20px 80px;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #f1f5f9 0%, #94a3b8 50%, #f1f5f9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tagline {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            font-weight: 300;
+        }
+
+        .tagline span {
+            color: var(--accent);
+        }
+
+        .description {
+            max-width: 600px;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 48px;
+        }
+
+        /* Download Buttons */
+        .download-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, var(--accent), #6366f1);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 24px var(--accent-glow);
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px var(--accent-glow);
+        }
+
+        .download-btn svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .other-downloads {
+            display: flex;
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+        .other-downloads a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .other-downloads a:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            color: var(--text-primary);
+        }
+
+        .version {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-top: 16px;
+        }
+
+        /* Screenshot */
+        .screenshot-container {
+            margin-top: 80px;
+            max-width: 1000px;
+            width: 90%;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .screenshot-container img {
+            width: 100%;
+            display: block;
+        }
+
+        .screenshot-placeholder {
+            width: 100%;
+            height: 500px;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 120px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 64px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            border-color: rgba(139, 92, 246, 0.3);
+            transform: translateY(-4px);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Footer */
+        footer {
+            padding: 48px 20px;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        footer p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav {
+                padding: 16px 20px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .other-downloads {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-gradient"></div>
+
+    <nav>
+        <div class="logo">
+            <img src="logo.png" alt="Cognito">
+            COGNITO
+        </div>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="https://github.com/yourusername/cognito">GitHub</a>
+            <a href="https://github.com/yourusername/cognito/releases">Releases</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <video autoplay loop muted playsinline class="hero-logo">
+            <source src="logo.mp4" type="video/mp4">
+        </video>
+        <h1>COGNITO</h1>
+        <p class="tagline"><span>Private.</span> Local. Fast.</p>
+        <p class="description">
+            The AI assistant that runs entirely on your machine. No cloud, no data collection, no subscriptions. Your
+            conversations stay yours.
+        </p>
+
+        <div class="download-section">
+            <!-- Primary download button - auto-detect OS -->
+            <a href="#" class="download-btn" id="main-download">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+                </svg>
+                <span id="download-text">Download for Mac</span>
+            </a>
+
+            <div class="other-downloads">
+                <a href="https://github.com/yourusername/cognito/releases/latest/download/Cognito-1.0.0-arm64.dmg">macOS
+                    (Apple Silicon)</a>
+                <a href="https://github.com/yourusername/cognito/releases/latest/download/Cognito-1.0.0.dmg">macOS
+                    (Intel)</a>
+                <a
+                    href="https://github.com/yourusername/cognito/releases/latest/download/Cognito-Setup-1.0.0.exe">Windows</a>
+                <a
+                    href="https://github.com/yourusername/cognito/releases/latest/download/Cognito-1.0.0.AppImage">Linux</a>
+            </div>
+
+            <p class="version">Version 1.0.0 · Requires Python 3.10+</p>
+        </div>
+
+        <div class="screenshot-container">
+            <div class="screenshot-placeholder">
+                <span>App Screenshot</span>
+            </div>
+            <!-- Replace with actual screenshot: <img src="screenshot.png" alt="Cognito Screenshot"> -->
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <h2>Features</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3>100% Private</h3>
+                <p>All inference runs locally on your hardware. No data ever leaves your machine. No API keys required.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Fast & Efficient</h3>
+                <p>Powered by llama.cpp for blazing fast inference. Supports Apple Silicon, NVIDIA GPUs, or CPU.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔍</div>
+                <h3>Smart Web Search</h3>
+                <p>Built-in web search that the AI can use when needed. Get up-to-date information without leaving the
+                    app.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📄</div>
+                <h3>Document Chat</h3>
+                <p>Upload PDFs and text files, then chat with your documents. Perfect for research and study.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⬇️</div>
+                <h3>Model Browser</h3>
+                <p>Browse and download models directly from Hugging Face. One-click install of any GGUF model.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎨</div>
+                <h3>Modern Interface</h3>
+                <p>Beautiful dark-themed UI with chat history, session management, and customizable system prompts.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>
+            Open source on <a href="https://github.com/yourusername/cognito">GitHub</a> ·
+            Built with ❤️ for privacy
+        </p>
+    </footer>
+
+    <script>
+        // Auto-detect OS and update download button
+        const mainDownload = document.getElementById('main-download');
+        const downloadText = document.getElementById('download-text');
+
+        const platform = navigator.platform.toLowerCase();
+        const userAgent = navigator.userAgent.toLowerCase();
+
+        if (platform.includes('mac') || platform.includes('darwin')) {
+            // Check for Apple Silicon
+            if (userAgent.includes('arm') || (navigator.userAgentData && navigator.userAgentData.platform === 'macOS')) {
+                mainDownload.href = 'https://github.com/yourusername/cognito/releases/latest/download/Cognito-1.0.0-arm64.dmg';
+                downloadText.textContent = 'Download for Mac (Apple Silicon)';
+            } else {
+                mainDownload.href = 'https://github.com/yourusername/cognito/releases/latest/download/Cognito-1.0.0.dmg';
+                downloadText.textContent = 'Download for Mac (Intel)';
+            }
+        } else if (platform.includes('win')) {
+            mainDownload.href = 'https://github.com/yourusername/cognito/releases/latest/download/Cognito-Setup-1.0.0.exe';
+            downloadText.textContent = 'Download for Windows';
+        } else if (platform.includes('linux')) {
+            mainDownload.href = 'https://github.com/yourusername/cognito/releases/latest/download/Cognito-1.0.0.AppImage';
+            downloadText.textContent = 'Download for Linux';
+        }
+    </script>
+</body>
+
+</html>

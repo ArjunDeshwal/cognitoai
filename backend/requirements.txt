@@ -1,0 +1,14 @@
+# Core backend
+fastapi
+uvicorn[standard]
+llama-cpp-python
+pydantic
+python-multipart
+httpx
+
+# Document RAG
+pymupdf>=1.24.0
+scikit-learn>=1.3.0
+
+# Web search
+faiss-cpu

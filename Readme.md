@@ -1,0 +1,182 @@
+# COGNITO
+
+**Private. Local. Fast.**
+
+A fully local AI assistant that runs on your machine. No cloud, no data collection, no subscriptions. Your conversations stay yours.
+
+![Cognito Screenshot](./docs/screenshot.png)
+
+---
+
+## ✨ Features
+
+### 🔒 100% Private
+- All inference runs locally on your hardware
+- No data ever leaves your machine
+- No API keys or cloud accounts required
+
+### 🚀 Fast & Lightweight
+- Powered by llama.cpp for efficient inference
+- Supports GGUF quantized models
+- Works on Apple Silicon, NVIDIA GPUs, or CPU
+
+### 🔍 Intelligent Search
+- Built-in web search (model decides when to search)
+- Deep search mode for comprehensive research
+- Automatic context injection
+
+### 📄 Document RAG
+- Upload PDFs and text files
+- Chat with your documents
+- TF-IDF based retrieval
+
+### 🎨 Modern Interface
+- Clean, dark-themed UI
+- Chat history with session management
+- System prompt customization
+
+### ⬇️ In-App Model Downloads
+- Browse models directly from Hugging Face
+- One-click download of any GGUF model
+- Automatic model management
+- No external tools needed
+
+---
+
+## 🛠️ Installation
+
+### Prerequisites
+- **Node.js** 18+ and npm
+- **Python** 3.10+
+- For GPU acceleration:
+  - macOS: Apple Silicon (M1/M2/M3) - works out of the box
+  - Linux/Windows: NVIDIA GPU with CUDA
+
+### Quick Start
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/cognito.git
+   cd cognito
+   ```
+
+2. **Set up Python backend**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   pip install -r backend/requirements.txt
+   ```
+
+3. **Install frontend dependencies**
+   ```bash
+   cd app
+   npm install
+   ```
+
+4. **Run the app**
+   ```bash
+   npm run electron:dev
+   ```
+
+5. **Download a model**
+   - Click "⬇️ Models" in the header
+   - Browse and download a GGUF model
+   - Select it to start chatting!
+
+### Recommended Models
+| Model | Size | Best For |
+|-------|------|----------|
+| Qwen2.5-3B-Instruct | ~2GB | Fast responses, good quality |
+| Mistral-7B-Instruct | ~4GB | Balanced performance |
+| Llama-3.1-8B-Instruct | ~5GB | Best quality |
+
+---
+
+## 📁 Project Structure
+
+```
+cognito/
+├── app/                    # Electron + React frontend
+│   ├── src/
+│   │   ├── App.tsx         # Main React component
+│   │   ├── App.css         # Styles
+│   │   ├── services/api.ts # API client
+│   │   └── components/     # UI components
+│   ├── electron/
+│   │   ├── main.cjs        # Electron main process
+│   │   └── preload.cjs     # Preload script
+│   └── package.json
+├── backend/
+│   ├── server.py           # FastAPI server
+│   ├── document_rag.py     # Document processing
+│   └── requirements.txt
+├── tools/
+│   └── info/web_search.py  # Web search tool
+└── README.md
+```
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Here's how to get started:
+
+### Development Setup
+
+1. Fork the repository
+2. Create a feature branch
+   ```bash
+   git checkout -b feature/amazing-feature
+   ```
+3. Make your changes
+4. Test thoroughly
+5. Commit with clear messages
+   ```bash
+   git commit -m "feat: add amazing feature"
+   ```
+6. Push and create a Pull Request
+
+### Contribution Ideas
+
+- **🐛 Bug Fixes** - Found a bug? We'd love a fix!
+- **✨ New Features** - Check issues for feature requests
+- **📖 Documentation** - Improve docs, add examples
+- **🎨 UI/UX** - Enhance the interface
+- **⚡ Performance** - Optimize inference, reduce memory
+- **🧪 Tests** - Add test coverage
+
+### Code Style
+
+- **Frontend**: TypeScript, React hooks, CSS modules
+- **Backend**: Python 3.10+, FastAPI, type hints
+- **Commits**: Use [Conventional Commits](https://www.conventionalcommits.org/)
+
+### Reporting Issues
+
+When reporting bugs, please include:
+- OS and version
+- Node.js and Python versions
+- Steps to reproduce
+- Error messages/logs
+
+---
+
+## 📜 License
+
+MIT License - see [LICENSE](./LICENSE) for details.
+
+---
+
+## 🙏 Acknowledgments
+
+- [llama.cpp](https://github.com/ggerganov/llama.cpp) - Fast LLM inference
+- [Hugging Face](https://huggingface.co) - Model hosting
+- [Electron](https://www.electronjs.org/) - Desktop framework
+- [FastAPI](https://fastapi.tiangolo.com/) - Python API framework
+
+---
+
+<p align="center">
+  <b>Built with ❤️ for privacy</b>
+</p>
+# cognitoai
