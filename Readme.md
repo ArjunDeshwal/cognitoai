@@ -171,8 +171,6 @@ MIT License - see [LICENSE](./LICENSE) for details.
 
 - [llama.cpp](https://github.com/ggerganov/llama.cpp) - Fast LLM inference
 - [Hugging Face](https://huggingface.co) - Model hosting
-- [Electron](https://www.electronjs.org/) - Desktop framework
-- [FastAPI](https://fastapi.tiangolo.com/) - Python API framework
 
 ---
 
