@@ -13,6 +13,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     strategy:
+      fail-fast: false
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
 
@@ -42,7 +43,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd app
-          npm run package
+          npm run package -- --publish never
           
       - name: Upload Artifacts to Release
         uses: softprops/action-gh-release@v2
