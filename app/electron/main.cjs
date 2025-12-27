@@ -11,7 +11,12 @@ const isDev = !app.isPackaged;
 function getPythonPath() {
   if (isDev) {
     // Point to the venv python executable
-    return path.join(__dirname, '../../venv/bin/python');
+    // Windows uses Scripts/python.exe, Unix uses bin/python
+    if (process.platform === 'win32') {
+      return path.join(__dirname, '../../venv/Scripts/python.exe');
+    } else {
+      return path.join(__dirname, '../../venv/bin/python');
+    }
   } else {
     // In production, it's a bundled executable in the resources folder
     const binaryName = process.platform === 'win32' ? 'api.exe' : 'api';

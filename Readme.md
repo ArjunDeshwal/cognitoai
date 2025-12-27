@@ -63,7 +63,22 @@ A fully local AI assistant that runs on your machine. No cloud, no data collecti
 2. **Set up Python backend**
    ```bash
    python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+   
+   **Activate the virtual environment:**
+   
+   *macOS/Linux:*
+   ```bash
+   source venv/bin/activate
+   ```
+   
+   *Windows:*
+   ```cmd
+   venv\Scripts\activate
+   ```
+   
+   **Install dependencies:**
+   ```bash
    pip install -r backend/requirements.txt
    ```
 
