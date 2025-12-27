@@ -4,6 +4,10 @@
   "version": "1.0.0",
   "description": "Private. Local. Fast. - Your local AI assistant",
   "author": "Cognito Team",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ArjunDeshwal/cognitoai.git"
+  },
   "private": true,
   "type": "module",
   "main": "electron/main.cjs",
