@@ -28,11 +28,11 @@ export async function checkBackendHealth(): Promise<HealthStatus | null> {
     }
 }
 
-export async function loadModel(modelPath: string) {
+export async function loadModel(modelPath: string, contextWindow: number = 8192) {
     const res = await fetch(`${API_URL}/v1/load_model`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ path: modelPath }),
+        body: JSON.stringify({ path: modelPath, n_ctx: contextWindow }),
     });
     if (!res.ok) {
         throw new Error(await res.text());

@@ -77,16 +77,20 @@ def health_check():
         "documents_count": doc_count
     }
 
+class LoadModelRequest(BaseModel):
+    path: str
+    n_ctx: int = 8192
+
 @app.post("/v1/load_model")
-def load_model(path: str = Body(..., embed=True)):
+def load_model(request: LoadModelRequest):
     global llm, current_model_name
-    if not os.path.exists(path):
+    if not os.path.exists(request.path):
         raise HTTPException(status_code=400, detail="Model file not found")
     
     try:
-        llm = Llama(model_path=path, n_gpu_layers=-1, verbose=True, n_ctx=8192)
-        current_model_name = os.path.basename(path)
-        return {"status": "success", "message": f"Loaded model: {path}"}
+        llm = Llama(model_path=request.path, n_gpu_layers=-1, verbose=True, n_ctx=request.n_ctx)
+        current_model_name = os.path.basename(request.path)
+        return {"status": "success", "message": f"Loaded model: {request.path} with context window: {request.n_ctx}"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

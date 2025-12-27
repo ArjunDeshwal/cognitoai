@@ -101,6 +101,13 @@ function App() {
   const [showSystemPrompt, setShowSystemPrompt] = useState(false);
   const [showOptionsMenu, setShowOptionsMenu] = useState(false);
 
+  // Context window (memory) state
+  const [contextWindow, setContextWindow] = useState<number>(() => {
+    const saved = localStorage.getItem('cognito_context_window');
+    return saved ? parseInt(saved, 10) : 8192;
+  });
+  const [showContextSettings, setShowContextSettings] = useState(false);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -192,7 +199,7 @@ function App() {
   const handleLoadModel = async () => {
     try {
       setLoading(true);
-      await loadModel(modelPath);
+      await loadModel(modelPath, contextWindow);
       setIsModelLoaded(true);
       if (!currentSessionId) {
         handleNewChat();
@@ -214,7 +221,7 @@ function App() {
       if (path) {
         setModelPath(path);
         setLoading(true);
-        await loadModel(path);
+        await loadModel(path, contextWindow);
         setIsModelLoaded(true);
         if (!currentSessionId) {
           handleNewChat();
@@ -269,6 +276,13 @@ function App() {
     setSystemPrompt(prompt);
     localStorage.setItem('cognito_system_prompt', prompt);
     setShowSystemPrompt(false);
+  };
+
+  // Context window handler
+  const handleSaveContextWindow = (size: number) => {
+    setContextWindow(size);
+    localStorage.setItem('cognito_context_window', size.toString());
+    setShowContextSettings(false);
   };
 
   const handleStop = () => {
@@ -503,6 +517,16 @@ function App() {
                     >
                       <span>📝</span> System Prompt
                       {systemPrompt.trim() && <span className="options-badge">Set</span>}
+                    </button>
+                    <button
+                      className="options-item"
+                      onClick={() => {
+                        setShowContextSettings(true);
+                        setShowOptionsMenu(false);
+                      }}
+                    >
+                      <span>🧠</span> Context Window
+                      <span className="options-badge">{contextWindow >= 1024 ? `${contextWindow / 1024}k` : contextWindow}</span>
                     </button>
                     <button
                       className="options-item danger"
@@ -742,6 +766,57 @@ function App() {
               <button
                 className="save-prompt-btn"
                 onClick={() => handleSaveSystemPrompt(systemPrompt)}
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Context Window Settings Modal */}
+      {showContextSettings && (
+        <div className="modal-overlay" onClick={() => setShowContextSettings(false)}>
+          <div className="system-prompt-modal" onClick={e => e.stopPropagation()}>
+            <div className="system-prompt-header">
+              <span>🧠 Context Window (Memory)</span>
+              <button
+                className="close-panel-btn"
+                onClick={() => setShowContextSettings(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="context-window-content">
+              <p className="context-description">
+                Set the context window size (how much conversation history the AI can remember).
+                Larger values use more memory but retain more context.
+              </p>
+              <div className="context-options">
+                {[
+                  { value: 2048, label: '2K' },
+                  { value: 4096, label: '4K' },
+                  { value: 8192, label: '8K' },
+                  { value: 16384, label: '16K' },
+                  { value: 32768, label: '32K' },
+                ].map(option => (
+                  <button
+                    key={option.value}
+                    className={`context-option ${contextWindow === option.value ? 'active' : ''}`}
+                    onClick={() => setContextWindow(option.value)}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+              <p className="context-note">
+                ⚠️ Changes take effect when you reload or change the model.
+              </p>
+            </div>
+            <div className="system-prompt-actions">
+              <button
+                className="save-prompt-btn"
+                onClick={() => handleSaveContextWindow(contextWindow)}
               >
                 Save
               </button>
