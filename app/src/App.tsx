@@ -504,6 +504,17 @@ function App() {
                       <span>📝</span> System Prompt
                       {systemPrompt.trim() && <span className="options-badge">Set</span>}
                     </button>
+                    <button
+                      className="options-item danger"
+                      onClick={() => {
+                        if (window.confirm('This will delete ALL chats and settings. Are you sure?')) {
+                          localStorage.clear();
+                          window.location.reload();
+                        }
+                      }}
+                    >
+                      <span>🗑️</span> Reset App
+                    </button>
                   </div>
                 )}
               </div>
