@@ -17,3 +17,4 @@ langchain-text-splitters
 aiohttp
 beautifulsoup4
 numpy
+pyinstaller

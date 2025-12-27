@@ -14,7 +14,8 @@ function getPythonPath() {
     return path.join(__dirname, '../../venv/bin/python');
   } else {
     // In production, it's a bundled executable in the resources folder
-    return path.join(process.resourcesPath, 'api', 'server');
+    const binaryName = process.platform === 'win32' ? 'api.exe' : 'api';
+    return path.join(process.resourcesPath, 'api', binaryName);
   }
 }
 

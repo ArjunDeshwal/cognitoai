@@ -35,19 +35,11 @@
     ],
     "extraResources": [
       {
-        "from": "../backend",
-        "to": "backend",
+        "from": "../backend/dist",
+        "to": "api",
         "filter": [
-          "**/*",
-          "!__pycache__/**"
-        ]
-      },
-      {
-        "from": "../tools",
-        "to": "tools",
-        "filter": [
-          "**/*",
-          "!__pycache__/**"
+          "api",
+          "api.exe"
         ]
       }
     ],

@@ -38,6 +38,37 @@ jobs:
           cd app
           npm install
 
+      - name: Build Python Backend
+        shell: bash
+        run: |
+          cd backend
+          pip install -r requirements.txt
+          pip install pyinstaller
+          # Determine separator for --add-data (: for unix, ; for windows)
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            SEP=";"
+          else
+            SEP=":"
+          fi
+          # Build standalone binary
+          pyinstaller --onefile --noconfirm --name api \
+            --add-data "../tools${SEP}tools" \
+            --collect-all llama_cpp \
+            --collect-all sentence_transformers \
+            --collect-all faiss \
+            --collect-all langchain_text_splitters \
+            --hidden-import uvicorn.logging \
+            --hidden-import uvicorn.loops \
+            --hidden-import uvicorn.loops.auto \
+            --hidden-import uvicorn.protocols \
+            --hidden-import uvicorn.protocols.http \
+            --hidden-import uvicorn.protocols.http.auto \
+            --hidden-import uvicorn.protocols.websockets \
+            --hidden-import uvicorn.protocols.websockets.auto \
+            --hidden-import uvicorn.lifespan \
+            --hidden-import uvicorn.lifespan.on \
+            server.py
+
       - name: Build Electron App
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

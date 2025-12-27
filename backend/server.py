@@ -13,6 +13,16 @@ import uvicorn
 from llama_cpp import Llama
 import asyncio
 
+# Handle PyInstaller bundle path for imports
+if getattr(sys, 'frozen', False):
+    # If the app is running as a bundle (PyInstaller)
+    bundle_dir = sys._MEIPASS
+    sys.path.append(bundle_dir)
+else:
+    # If running normally (dev mode)
+    bundle_dir = os.path.dirname(os.path.abspath(__file__))
+    sys.path.append(os.path.join(bundle_dir, '..'))
+
 # Import document RAG module
 try:
     from document_rag import document_store, extract_text_from_pdf, chunk_text
@@ -20,9 +30,6 @@ try:
 except ImportError as e:
     print(f"Warning: Could not import document_rag: {e}. Document RAG will be disabled.")
     RAG_AVAILABLE = False
-
-# Add project root to path to find tools
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 # Try importing the tool
 try:
