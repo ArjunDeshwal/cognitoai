@@ -195,6 +195,15 @@
             color: var(--text-primary);
         }
 
+        .coming-soon-badge {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.01);
+        }
+
         .version {
             color: var(--text-secondary);
             font-size: 0.85rem;
@@ -335,26 +344,23 @@
         </p>
 
         <div class="download-section">
-            <!-- Primary download button - auto-detect OS -->
-            <a href="#" class="download-btn" id="main-download">
+            <!-- Primary download button - set to Coming Soon -->
+            <a href="javascript:void(0)" class="download-btn" id="main-download" style="cursor: default; opacity: 0.8;">
                 <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
                 </svg>
-                <span id="download-text">Download for Mac</span>
+                <span id="download-text">Coming Soon</span>
             </a>
 
             <div class="other-downloads">
-                <a href="https://github.com/ArjunDeshwal/cognitoai/releases/latest/download/Cognito-1.0.0-arm64.dmg">macOS
-                    (Apple Silicon)</a>
-                <a href="https://github.com/ArjunDeshwal/cognitoai/releases/latest/download/Cognito-1.0.0.dmg">macOS
-                    (Intel)</a>
-                <a
-                    href="https://github.com/ArjunDeshwal/cognitoai/releases/latest/download/Cognito.Setup.1.0.0.exe">Windows</a>
-                <a
-                    href="https://github.com/ArjunDeshwal/cognitoai/releases/latest/download/Cognito-1.0.0.AppImage">Linux</a>
+                <span class="coming-soon-badge">macOS (Apple Silicon) - Coming Soon</span>
+                <span class="coming-soon-badge">macOS (Intel) - Coming Soon</span>
+                <span class="coming-soon-badge">Windows - Coming Soon</span>
+                <span class="coming-soon-badge">Linux - Coming Soon</span>
             </div>
 
-            <p class="version">Version 1.0.0 · Requires Python 3.10+</p>
+            <p class="version">Version 1.0.0 · Pre-Alpha</p>
         </div>
 
         <div class="screenshot-container">
@@ -408,29 +414,8 @@
     </footer>
 
     <script>
-        // Auto-detect OS and update download button
-        const mainDownload = document.getElementById('main-download');
-        const downloadText = document.getElementById('download-text');
-
-        const platform = navigator.platform.toLowerCase();
-        const userAgent = navigator.userAgent.toLowerCase();
-
-        if (platform.includes('mac') || platform.includes('darwin')) {
-            // Check for Apple Silicon
-            if (userAgent.includes('arm') || (navigator.userAgentData && navigator.userAgentData.platform === 'macOS')) {
-                mainDownload.href = 'https://github.com/ArjunDeshwal/cognitoai/releases/latest/download/Cognito-1.0.0-arm64.dmg';
-                downloadText.textContent = 'Download for Mac (Apple Silicon)';
-            } else {
-                mainDownload.href = 'https://github.com/ArjunDeshwal/cognitoai/releases/latest/download/Cognito-1.0.0.dmg';
-                downloadText.textContent = 'Download for Mac (Intel)';
-            }
-        } else if (platform.includes('win')) {
-            mainDownload.href = 'https://github.com/ArjunDeshwal/cognitoai/releases/latest/download/Cognito.Setup.1.0.0.exe';
-            downloadText.textContent = 'Download for Windows';
-        } else if (platform.includes('linux')) {
-            mainDownload.href = 'https://github.com/ArjunDeshwal/cognitoai/releases/latest/download/Cognito-1.0.0.AppImage';
-            downloadText.textContent = 'Download for Linux';
-        }
+        // Download disabled - Placeholder text set to Coming Soon
+        document.getElementById('download-text').textContent = 'Coming Soon';
     </script>
 </body>
 
