@@ -38,6 +38,9 @@ jobs:
 
       - name: Build Python Backend
         shell: bash
+        env:
+          # Fix llama-cpp-python build on macOS ARM runners
+          CMAKE_ARGS: ${{ matrix.os == 'macos-latest' && '-DGGML_NATIVE=OFF' || '' }}
         run: |
           cd backend
           pip install -r requirements.txt
