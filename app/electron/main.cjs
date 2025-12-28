@@ -8,6 +8,27 @@ let pythonProcess = null;
 
 const isDev = !app.isPackaged;
 
+// === DEBUG LOGGING FOR PACKAGED BUILDS ===
+const logFile = isDev ? null : path.join(app.getPath('userData'), 'cognito-debug.log');
+
+function log(message) {
+  const timestamp = new Date().toISOString();
+  const logMessage = `[${timestamp}] ${message}\n`;
+  console.log(message);
+  if (logFile) {
+    fs.appendFileSync(logFile, logMessage);
+  }
+}
+
+// Clear log on startup
+if (logFile) {
+  try {
+    fs.writeFileSync(logFile, `=== Cognito Debug Log ===\nStarted: ${new Date().toISOString()}\nisDev: ${isDev}\nplatform: ${process.platform}\n\n`);
+  } catch (e) {
+    // Ignore if we can't write
+  }
+}
+
 function getPythonPath() {
   if (isDev) {
     // Point to the venv python executable
@@ -35,14 +56,16 @@ function startPythonServer() {
   const pythonPath = getPythonPath();
   const scriptPath = getScriptPath();
 
-  console.log('Starting Python Server...');
-  console.log('Python Path:', pythonPath);
+  log('Starting Python Server...');
+  log('Python Path: ' + pythonPath);
+  log('Python exists: ' + fs.existsSync(pythonPath));
+  log('resourcesPath: ' + (process.resourcesPath || 'N/A'));
 
   if (isDev) {
     // In dev, run: python3 -m uvicorn server:app --host 127.0.0.1 --port 8000
     // We need to set the cwd to backend so imports work
     const cwd = path.join(__dirname, '../../backend');
-    console.log('CWD:', cwd);
+    log('CWD: ' + cwd);
 
     pythonProcess = spawn(pythonPath, ['-m', 'uvicorn', 'server:app', '--host', '127.0.0.1', '--port', '8000'], {
       cwd: cwd,
@@ -51,22 +74,33 @@ function startPythonServer() {
     });
   } else {
     // In prod, just run the binary
-    pythonProcess = spawn(pythonPath, [], {
-      env: { ...process.env, PORT: '8000' },
-      stdio: 'pipe'
-    });
+    log('Spawning production binary...');
+    try {
+      pythonProcess = spawn(pythonPath, [], {
+        env: { ...process.env, PORT: '8000' },
+        stdio: 'pipe'
+      });
+      log('Spawn successful, PID: ' + pythonProcess.pid);
+    } catch (e) {
+      log('ERROR spawning Python: ' + e.message);
+      return;
+    }
   }
 
   pythonProcess.stdout.on('data', (data) => {
-    console.log(`[Python]: ${data}`);
+    log('[Python]: ' + data);
   });
 
   pythonProcess.stderr.on('data', (data) => {
-    console.error(`[Python API]: ${data}`);
+    log('[Python ERROR]: ' + data);
+  });
+
+  pythonProcess.on('error', (err) => {
+    log('Python process error: ' + err.message);
   });
 
   pythonProcess.on('close', (code) => {
-    console.log(`Python process exited with code ${code}`);
+    log('Python process exited with code ' + code);
   });
 }
 
@@ -83,14 +117,28 @@ function createWindow() {
   });
 
   if (isDev) {
+    log('Loading dev URL: http://localhost:5173');
     mainWindow.loadURL('http://localhost:5173');
     // mainWindow.webContents.openDevTools();
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
+    const htmlPath = path.join(__dirname, '../dist/index.html');
+    log('Loading production HTML: ' + htmlPath);
+    log('HTML exists: ' + fs.existsSync(htmlPath));
+    mainWindow.loadFile(htmlPath);
   }
+
+  // Log any load errors
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
+    log('Page failed to load: ' + errorCode + ' - ' + errorDescription);
+  });
+
+  mainWindow.webContents.on('did-finish-load', () => {
+    log('Page finished loading successfully');
+  });
 }
 
 app.whenReady().then(() => {
+  log('App is ready, starting initialization...');
   // Register IPC handlers once, before creating windows
   ipcMain.handle('dialog:openFile', async (event) => {
     const window = BrowserWindow.fromWebContents(event.sender);
