@@ -15,7 +15,23 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        include:
+          # macOS Apple Silicon (arm64) - macos-latest is arm64
+          - os: macos-latest
+            arch: arm64
+            electron_args: "--mac --arm64"
+          # macOS Intel (x64) - macos-13 is x64
+          - os: macos-13
+            arch: x64
+            electron_args: "--mac --x64"
+          # Windows x64
+          - os: windows-latest
+            arch: x64
+            electron_args: "--win --x64"
+          # Linux x64
+          - os: ubuntu-latest
+            arch: x64
+            electron_args: "--linux --x64"
 
     steps:
       - name: Checkout Code
@@ -40,7 +56,7 @@ jobs:
         shell: bash
         env:
           # Fix llama-cpp-python build on macOS ARM runners
-          CMAKE_ARGS: ${{ matrix.os == 'macos-latest' && '-DGGML_NATIVE=OFF' || '' }}
+          CMAKE_ARGS: ${{ startsWith(matrix.os, 'macos') && '-DGGML_NATIVE=OFF' || '' }}
         run: |
           cd backend
           pip install -r requirements.txt
@@ -75,7 +91,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd app
-          npm run package -- --publish never
+          npm run build
+          npx electron-builder ${{ matrix.electron_args }} --publish never
           
       - name: Upload Artifacts to Release
         uses: softprops/action-gh-release@v2
