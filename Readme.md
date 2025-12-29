@@ -75,11 +75,6 @@ A fully local AI assistant that runs on your machine. No cloud, no data collecti
    venv\Scripts\activate
    pip install -r backend/requirements.txt
    ```
-   
-   **Install dependencies:**
-   ```bash
-   pip install -r backend/requirements.txt
-   ```
 
 3. **Install frontend dependencies**
    ```bash
