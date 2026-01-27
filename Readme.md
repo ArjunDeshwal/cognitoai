@@ -28,7 +28,6 @@ A fully local AI assistant that runs on your machine. No cloud, no data collecti
 ### 📄 Document RAG
 - Upload PDFs and text files
 - Chat with your documents
-- TF-IDF based retrieval
 
 ### 🎨 Modern Interface
 - Clean, dark-themed UI
