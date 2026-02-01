@@ -4,535 +4,366 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cognito // SYSTEM_ONLINE</title>
+    <title>Cognito — Private Local Intelligence</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap"
         rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #050510;
-            --neon-pink: #ff00ff;
-            --neon-cyan: #00ffff;
-            --neon-purple: #bd00ff;
-            --grid-color: rgba(189, 0, 255, 0.2);
-            --text-glow: 0 0 10px rgba(0, 255, 255, 0.5);
+            --bg: #fdfdfd;
+            --fg: #111111;
+            --fg-secondary: #666666;
+            --accent: #ff4f00;
+            /* International Orange */
+            --border: #e0e0e0;
+            --grid-unit: 24px;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
         }
 
         body {
-            background-color: var(--bg-dark);
-            color: #fff;
-            font-family: 'Share Tech Mono', monospace;
-            overflow-x: hidden;
+            background-color: var(--bg);
+            color: var(--fg);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.4;
+            display: flex;
+            flex-direction: column;
             min-height: 100vh;
         }
 
-        /* Scanline Overlay */
-        .scanlines {
-            position: fixed;
-            top: 0;
-            left: 0;
+        /* 12-Column Grid System */
+        .container {
             width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom,
-                    rgba(255, 255, 255, 0),
-                    rgba(255, 255, 255, 0) 50%,
-                    rgba(0, 0, 0, 0.2) 50%,
-                    rgba(0, 0, 0, 0.2));
-            background-size: 100% 4px;
-            pointer-events: none;
-            z-index: 1000;
-            /* Subtle CRT flicker */
-            animation: flicker 0.15s infinite;
-            opacity: 0.3;
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 calc(var(--grid-unit) * 2);
         }
 
-        /* Retro Grid Background - Animated */
-        .grid-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            perspective: 1000px;
-            z-index: -1;
-            overflow: hidden;
+        /* Section Layout */
+        section {
+            padding: calc(var(--grid-unit) * 4) 0;
         }
 
-        .grid-floor {
-            position: absolute;
-            bottom: -25%;
-            left: -50%;
-            width: 200%;
-            height: 100%;
-            background-image:
-                linear-gradient(var(--grid-color) 1px, transparent 1px),
-                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-            background-size: 50px 50px;
-            transform: rotateX(60deg);
-            animation: gridMove 20s linear infinite;
-            mask-image: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 60%);
-            -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 60%);
+        /* Typography */
+        h1,
+        h2,
+        h3 {
+            font-family: 'Instrument Sans', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            text-transform: uppercase;
         }
 
-        .grid-sky {
-            position: absolute;
-            top: 0;
-            width: 100%;
-            height: 60%;
-            background: radial-gradient(circle at bottom, #1a0b2e 0%, var(--bg-dark) 70%);
+        h1 {
+            font-size: clamp(3rem, 15vw, 12rem);
+            line-height: 0.85;
+            margin-bottom: var(--grid-unit);
+            font-weight: 800;
+        }
+
+        h2 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            margin-bottom: calc(var(--grid-unit) * 2);
+            border-bottom: 2px solid var(--fg);
+            display: inline-block;
+            padding-bottom: 8px;
+        }
+
+        p {
+            font-size: 1.125rem;
+            max-width: 32ch;
+            color: var(--fg-secondary);
         }
 
         /* Navigation */
         nav {
+            padding: var(--grid-unit) 0;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            background: rgba(253, 253, 253, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        nav .container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 40px;
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 100;
-            background: rgba(5, 5, 16, 0.8);
-            backdrop-filter: blur(5px);
-            border-bottom: 1px solid var(--neon-purple);
-            box-shadow: 0 0 15px rgba(189, 0, 255, 0.3);
         }
 
         .logo {
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 900;
-            font-size: 1.5rem;
-            color: #fff;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-shadow: 2px 2px 0px var(--neon-pink);
+            font-weight: 800;
+            font-size: 1.25rem;
+            letter-spacing: -0.02em;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            color: var(--fg);
+            text-decoration: none;
         }
 
-        .logo img {
-            width: 35px;
-            height: 35px;
-            border: 2px solid var(--neon-cyan);
-            border-radius: 4px;
-            box-shadow: 0 0 10px var(--neon-cyan);
+        .logo-box {
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 900;
         }
 
         .nav-links {
             display: flex;
-            gap: 30px;
+            gap: calc(var(--grid-unit) * 1.5);
         }
 
         .nav-links a {
-            color: var(--neon-cyan);
             text-decoration: none;
-            font-size: 1.1rem;
+            color: var(--fg);
+            font-weight: 600;
+            font-size: 0.9rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: 0.3s;
-            position: relative;
+            letter-spacing: 0.05em;
+            transition: color 0.2s;
         }
 
         .nav-links a:hover {
-            color: #fff;
-            text-shadow: 0 0 8px var(--neon-cyan);
+            color: var(--accent);
         }
 
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: -5px;
-            left: 0;
-            background-color: var(--neon-pink);
-            transition: 0.3s;
-            box-shadow: 0 0 10px var(--neon-pink);
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-
-        /* Hero Section */
+        /* Hero */
         .hero {
-            height: 100vh;
+            padding-top: calc(var(--grid-unit) * 6);
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: var(--grid-unit);
+        }
+
+        .hero-text {
+            grid-column: 1 / span 12;
+        }
+
+        .hero-meta {
+            grid-column: 1 / span 12;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            position: relative;
-            padding-top: 60px;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: calc(var(--grid-unit) * 2);
+            padding-top: var(--grid-unit);
+            border-top: 1px solid var(--fg);
         }
 
-        .hero-video {
-            width: 180px;
-            height: 180px;
-            border: 4px solid var(--neon-cyan);
-            border-radius: 50%;
-            box-shadow: 0 0 30px var(--neon-cyan), inset 0 0 20px var(--neon-cyan);
-            object-fit: cover;
-            margin-bottom: 30px;
-            background: #000;
-        }
-
-        h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 4.5rem;
-            font-weight: 900;
-            letter-spacing: 5px;
-            margin-bottom: 10px;
-            position: relative;
-            color: #fff;
-            text-shadow: 3px 3px 0px var(--neon-purple), -2px -2px 0px var(--neon-cyan);
-            animation: glitchText 3s infinite alternate-reverse;
-        }
-
-        .tagline {
-            font-size: 1.8rem;
-            color: var(--neon-pink);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 20px;
-            text-shadow: 0 0 10px var(--neon-pink);
-        }
-
-        .description {
-            max-width: 600px;
-            font-size: 1.2rem;
-            line-height: 1.6;
-            margin-bottom: 40px;
-            color: #e0e0e0;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 20px;
-            border: 1px solid var(--neon-cyan);
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
-        }
-
-        /* Cyber Button */
-        .cyber-btn {
-            background: transparent;
-            color: #fff;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 700;
-            font-size: 1.2rem;
-            padding: 15px 40px;
-            border: 2px solid var(--neon-cyan);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: 0.3s;
+        /* Call to Action */
+        .cta-btn {
+            background: var(--accent);
+            color: white;
+            padding: 18px 32px;
             text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+            font-weight: 700;
+            font-family: 'Instrument Sans', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: inline-block;
+            transition: background 0.2s, transform 0.1s;
         }
 
-        .cyber-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.4), transparent);
-            transition: 0.5s;
-        }
-
-        .cyber-btn:hover {
-            background: rgba(0, 255, 255, 0.1);
-            text-shadow: 0 0 10px #fff;
+        .cta-btn:hover {
+            background: #e64600;
             transform: translateY(-2px);
-            box-shadow: 0 0 30px var(--neon-cyan);
         }
 
-        .cyber-btn:hover::before {
-            left: 100%;
+        .cta-btn:active {
+            transform: translateY(0);
         }
 
-        .version {
-            margin-top: 20px;
-            font-size: 0.9rem;
-            color: var(--neon-purple);
-            text-transform: uppercase;
-        }
-
-        /* Screenshot */
-        .screenshot-container {
-            width: 90%;
-            max-width: 1000px;
-            margin-top: 40px;
-            border: 2px solid var(--neon-purple);
-            box-shadow: 0 0 30px rgba(189, 0, 255, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .screenshot-container::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, rgba(189, 0, 255, 0.1) 0%, transparent 100%);
-            pointer-events: none;
-        }
-
-        .screenshot-container img {
-            width: 100%;
-            display: block;
-            filter: contrast(1.1) brightness(0.9);
-        }
-
-        /* Features */
-        .features {
-            padding: 80px 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-            position: relative;
-        }
-
-        h2.section-title {
-            font-family: 'Orbitron', sans-serif;
-            text-align: center;
-            font-size: 3rem;
-            color: #fff;
-            margin-bottom: 60px;
-            text-shadow: 0 0 15px var(--neon-cyan);
-            text-transform: uppercase;
-        }
-
+        /* Features Grid */
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
+            grid-template-columns: repeat(12, 1fr);
+            gap: var(--grid-unit);
+            margin-top: calc(var(--grid-unit) * 4);
         }
 
-        .feature-card {
-            background: rgba(10, 10, 25, 0.7);
-            border: 1px solid var(--neon-purple);
-            padding: 30px;
-            position: relative;
-            transition: 0.3s;
+        .feature-item {
+            grid-column: span 4;
+            border-top: 1px solid var(--fg);
+            padding-top: var(--grid-unit);
+        }
+
+        .feature-number {
+            font-family: 'Instrument Sans', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .feature-item h3 {
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+        }
+
+        /* Media */
+        .screenshot-box {
+            grid-column: 1 / span 12;
+            background: #eee;
+            aspect-ratio: 16 / 9;
+            margin-top: calc(var(--grid-unit) * 4);
+            border: 1px solid var(--border);
             overflow: hidden;
-            box-shadow: 0 0 10px rgba(189, 0, 255, 0.1);
         }
 
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
+        .screenshot-box img {
             width: 100%;
-            height: 2px;
-            background: var(--neon-pink);
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: 0.3s;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(1);
+            transition: filter 0.5s;
         }
 
-        .feature-card:hover {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 0 25px rgba(189, 0, 255, 0.4);
-            border-color: var(--neon-pink);
-        }
-
-        .feature-card:hover::before {
-            transform: scaleX(1);
-        }
-
-        .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            filter: drop-shadow(0 0 5px var(--neon-cyan));
-        }
-
-        .feature-card h3 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.4rem;
-            margin-bottom: 15px;
-            color: var(--neon-cyan);
-        }
-
-        .feature-card p {
-            color: #ccc;
-            line-height: 1.5;
+        .screenshot-box:hover img {
+            filter: grayscale(0);
         }
 
         /* Footer */
         footer {
-            text-align: center;
-            padding: 50px 20px;
-            border-top: 1px solid var(--neon-cyan);
-            background: #020205;
-            position: relative;
-            z-index: 10;
+            margin-top: auto;
+            border-top: 1px solid var(--border);
+            padding: calc(var(--grid-unit) * 2) 0;
+            font-size: 0.875rem;
+            color: var(--fg-secondary);
         }
 
-        footer p {
-            color: var(--neon-purple);
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
+        footer .container {
+            display: flex;
+            justify-content: space-between;
         }
 
         footer a {
-            color: #fff;
+            color: var(--fg);
             text-decoration: none;
-            border-bottom: 1px solid var(--neon-pink);
+            font-weight: 700;
         }
 
-        /* Animations */
-        @keyframes gridMove {
-            0% {
-                transform: rotateX(60deg) translateY(0);
-            }
-
-            100% {
-                transform: rotateX(60deg) translateY(50px);
-            }
-        }
-
-        @keyframes glitchText {
-            0% {
-                text-shadow: 3px 3px 0px var(--neon-purple), -2px -2px 0px var(--neon-cyan);
-            }
-
-            20% {
-                text-shadow: -3px -3px 0px var(--neon-purple), 2px 2px 0px var(--neon-cyan);
-            }
-
-            40% {
-                text-shadow: 2px -2px 0px var(--neon-purple), -2px 2px 0px var(--neon-cyan);
-            }
-
-            100% {
-                text-shadow: 3px 3px 0px var(--neon-purple), -2px -2px 0px var(--neon-cyan);
+        /* Mobile */
+        @media (max-width: 1024px) {
+            .feature-item {
+                grid-column: span 6;
             }
         }
 
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2.5rem;
-            }
-
             .nav-links {
                 display: none;
             }
 
-            .hero-video {
-                width: 120px;
-                height: 120px;
+            .feature-item {
+                grid-column: span 12;
             }
 
-            .grid-floor {
-                bottom: -10%;
+            .hero-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 24px;
+            }
+
+            p {
+                max-width: 100%;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="scanlines"></div>
-    <div class="grid-bg">
-        <div class="grid-sky"></div>
-        <div class="grid-floor"></div>
-    </div>
-
     <nav>
-        <div class="logo">
-            <img src="logo.png" alt="Cognito Logo">
-            COGNITO
-        </div>
-        <div class="nav-links">
-            <a href="#features">Builds</a>
-            <a href="docs.html">Protocols</a>
-            <a href="https://github.com/ArjunDeshwal/cognitoai">Source_Code</a>
+        <div class="container">
+            <a href="index.html" class="logo">
+                <div class="logo-box">C</div>
+                COGNITO
+            </a>
+            <div class="nav-links">
+                <a href="#features">01 Features</a>
+                <a href="docs.html">02 Protocols</a>
+                <a href="https://github.com/ArjunDeshwal/cognitoai">03 Source</a>
+            </div>
         </div>
     </nav>
 
-    <section class="hero">
-        <video autoplay loop muted playsinline class="hero-video">
-            <source src="logo.mp4" type="video/mp4">
-        </video>
-        <h1>COGNITO</h1>
-        <p class="tagline">Private. Local. <span style="color: var(--neon-cyan);">Unrestricted.</span></p>
-        <div class="description">
-            <p>Access neural networks directly on your hardware.</p>
-            <p>No Cloud. No Logs. Total Control.</p>
-        </div>
+    <main class="container">
+        <section class="hero">
+            <div class="hero-text">
+                <h1>COGNITO</h1>
+                <p>A precision-engineered neural workspace for local machine intelligence. Designed for privacy, speed,
+                    and objective control.</p>
+            </div>
+            <div class="hero-meta">
+                <div>
+                    <span
+                        style="font-size: 0.75rem; font-weight: 800; display: block; margin-bottom: 4px;">AVAILABILITY</span>
+                    <span style="font-weight: 700; font-size: 1.1rem;">OPEN SOURCE SYSTEM 1.0</span>
+                </div>
+                <a href="https://github.com/ArjunDeshwal/cognitoai#installation" class="cta-btn">Initialize Installation
+                    —></a>
+            </div>
 
-        <div class="download-section">
-            <a href="https://github.com/ArjunDeshwal/cognitoai#installation" class="cyber-btn">
-                <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24" style="margin-right: 8px;">
-                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
-                </svg>
-                INITIATE_INSTALL
-            </a>
-            <p class="version">System Version 1.0.0 // Pre-Alpha</p>
-        </div>
+            <div class="screenshot-box">
+                <img src="screenshot.png" alt="Cognito Interface Analysis">
+            </div>
+        </section>
 
-        <div class="screenshot-container">
-            <img src="screenshot.png" alt="Cognito Interface">
-        </div>
-    </section>
-
-    <section class="features" id="features">
-        <h2 class="section-title">System Modules</h2>
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">🔒</div>
-                <h3>Zero Tracking</h3>
-                <p>Inference runs on your local silicon. No data packets leave the subnet. Full operational privacy
-                    maintained.</p>
+        <section id="features">
+            <h2>System Capabilities</h2>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <span class="feature-number">01</span>
+                    <h3>Local Execution</h3>
+                    <p>All neural inference occurs on local hardware. Zero data transmission to external servers.</p>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-number">02</span>
+                    <h3>Neural Engine</h3>
+                    <p>Optimized for Apple Silicon and CUDA. High-efficiency GGUF quantization protocols.</p>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-number">03</span>
+                    <h3>Context Retrieval</h3>
+                    <p>Autonomous web extraction and document RAG integration for enhanced reasoning.</p>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-number">04</span>
+                    <h3>Model Depot</h3>
+                    <p>Direct integration with global repositories for seamless weight extraction and deployment.</p>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-number">05</span>
+                    <h3>Interface</h3>
+                    <p>A systematic, distraction-free environment designed for extended professional research.</p>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-number">06</span>
+                    <h3>Objective</h3>
+                    <p>Total control over system prompts, temperatures, and internal neural states.</p>
+                </div>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon">⚡</div>
-                <h3>Hyper-Fast</h3>
-                <p>Engineered with llama.cpp. Optimized for Apple Silicon & CUDA cores. Latency minimized.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🌐</div>
-                <h3>Net Runner</h3>
-                <p>Autonomous web crawlers retrieve real-time data for enhanced context injection.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">📄</div>
-                <h3>Data Link</h3>
-                <p>Upload PDFs and text logs. RAG protocols enabled for document analysis.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">💾</div>
-                <h3>Model Depot</h3>
-                <p>Direct pipe to Hugging Face. One-click GGUF model extraction and deployment.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🖥️</div>
-                <h3>Visual Core</h3>
-                <p>Sleek dark-mode interface designed for extended terminal sessions.</p>
-            </div>
-        </div>
-    </section>
+        </section>
+    </main>
 
     <footer>
-        <p>
-            Open Source on <a href="https://github.com/ArjunDeshwal/cognitoai">GitHub</a> //
-            Built for the <span style="color: var(--neon-pink);">Resistance</span>
-        </p>
+        <div class="container">
+            <p>© 2026 — COGNITO INTELLIGENCE SYSTEMS</p>
+            <p>BUILT ON <a href="https://github.com/ArjunDeshwal/cognitoai">GITHUB</a></p>
+        </div>
     </footer>
 </body>
 
