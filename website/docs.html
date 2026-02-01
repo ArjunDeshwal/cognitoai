@@ -90,6 +90,26 @@
             font-weight: 900;
         }
 
+        /* NAV LINKS FIX - Corrected from neon-cyan to Swiss theme variables */
+        .nav-links {
+            display: flex;
+            gap: calc(var(--grid-unit) * 1.5);
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--fg);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
         /* Sidebar */
         aside {
             grid-column: 1 / span 3;
@@ -129,7 +149,8 @@
 
         h1,
         h2,
-        h3 {
+        h3,
+        h4 {
             font-family: 'Instrument Sans', sans-serif;
             font-weight: 700;
             letter-spacing: -0.02em;
@@ -157,9 +178,18 @@
             color: var(--accent);
         }
 
+        h4 {
+            font-size: 1rem;
+            margin-top: 24px;
+            color: var(--fg);
+            border-left: 3px solid var(--accent);
+            padding-left: 12px;
+        }
+
         p {
             margin-bottom: 24px;
             font-size: 1.1rem;
+            color: #333;
         }
 
         ul {
@@ -183,6 +213,7 @@
             padding: 4px 8px;
             border-radius: 2px;
             font-size: 0.9rem;
+            color: var(--accent);
         }
 
         pre {
@@ -191,6 +222,7 @@
             padding: var(--grid-unit);
             overflow-x: auto;
             margin-bottom: 32px;
+            border-left: 8px solid var(--accent);
         }
 
         pre code {
@@ -201,10 +233,19 @@
 
         .alert {
             background: #fff8f5;
+            border: 1px solid var(--border);
             border-left: 4px solid var(--accent);
             padding: 24px;
             margin: 32px 0;
             font-size: 1rem;
+        }
+
+        .api-endpoint {
+            font-family: ui-monospace, monospace;
+            background: #eee;
+            padding: 4px 8px;
+            font-weight: 700;
+            margin-right: 8px;
         }
 
         @media (max-width: 1024px) {
@@ -214,6 +255,10 @@
 
             main {
                 grid-column: 1 / span 12;
+            }
+
+            .nav-links {
+                display: none;
             }
         }
     </style>
@@ -238,71 +283,123 @@
         <div class="layout">
             <aside>
                 <div class="sidebar-links">
-                    <a href="#installation">01 Installation</a>
-                    <a href="#quick-start">02 Quick Start</a>
-                    <a href="#models">03 Model Depot</a>
-                    <a href="#features">04 Capabilities</a>
-                    <a href="#troubleshooting">05 Debugging</a>
+                    <a href="#architecture">01 Architecture</a>
+                    <a href="#installation">02 Setup</a>
+                    <a href="#rag">03 Document RAG</a>
+                    <a href="#search">04 Agentic Search</a>
+                    <a href="#models">05 Model Management</a>
+                    <a href="#api">06 API Reference</a>
                 </div>
             </aside>
 
             <main>
                 <h1>System Protocols</h1>
-                <p>Cognito is a functional workstation environment. This documentation outlines the objective technical
-                    standard for local deployment and operation.</p>
+                <p>Cognito is an objective workspace for local machine intelligence. This guide provides an exhaustive
+                    technical standard for the system's architecture and operation.</p>
 
-                <h2 id="installation">01 Installation</h2>
-                <p>Cognito requires local environment preparation. No pre-packaged binaries are supplied to ensure
-                    maximum transparency and source-level control.</p>
-
-                <h3>Requirements</h3>
+                <h2 id="architecture">01 Architecture</h2>
+                <p>The system is built on a decoupled architecture composed of three primary layers:</p>
                 <ul>
-                    <li><strong>Node.js Environment (v18+)</strong>: Functional requirement for interface management.
-                    </li>
-                    <li><strong>Python Core (v3.10+)</strong>: Required for neural processing and backend logic.</li>
+                    <li><strong>Application Layer:</strong> Electron-based container managing window lifecycle and IPC
+                        bridge.</li>
+                    <li><strong>Intelligence Layer:</strong> FastAPI backend localized to the host machine, wrapping
+                        <code>llama-cpp-python</code>.</li>
+                    <li><strong>Retrieval Layer:</strong> In-memory TF-IDF vectorization engine for document context and
+                        agentic web-search handlers.</li>
                 </ul>
 
-                <h2 id="quick-start">02 Quick Start</h2>
-                <p>Execute the sequential protocol below:</p>
+                <h2 id="installation">02 Setup</h2>
+                <p>Cognito requires local runtime preparation. We favor source-level deployment to ensure system
+                    integrity and auditability.</p>
 
-                <p>Step A: Remote Data Acquisition</p>
-                <pre><code>git clone https://github.com/ArjunDeshwal/cognitoai.git
-cd cognitoai</code></pre>
+                <h3>Prerequisites</h3>
+                <ul>
+                    <li><strong>Node.js (v18.0.0+)</strong>: Required for the React interface.</li>
+                    <li><strong>Python (v3.10.0+)</strong>: Required for neural weights processing and API services.
+                    </li>
+                    <li><strong>Build Tools</strong>: C++ compiler (Xcode on Mac, VS Build Tools on Windows) for
+                        compiling <code>llama-cpp</code> bindings.</li>
+                </ul>
 
-                <p>Step B: Environment Isolation</p>
-                <pre><code># Virtual Environment Initialization
+                <h3>Initial Boot Sequence</h3>
+                <pre><code># Protocol 01: Remote Data Acquisition
+git clone https://github.com/ArjunDeshwal/cognitoai.git
+cd cognitoai
+
+# Protocol 02: Intelligence Environment
 python -m venv venv
+# Unix: source venv/bin/activate | Win: venv\Scripts\activate
+pip install -r backend/requirements.txt
 
-# Activation (OS Dependent)
-# Win: venv\Scripts\activate
-# Unix: source venv/bin/activate
-
-# Dependency Injection
-pip install -r backend/requirements.txt</code></pre>
-
-                <p>Step C: Interface Initialization</p>
-                <pre><code>cd app
+# Protocol 03: Interface Deployment
+cd app
 npm install
 npm run electron:dev</code></pre>
 
+                <h2 id="rag">03 Document RAG</h2>
+                <p>Cognito implements a Retrieval-Augmented Generation (RAG) system for local knowledge injection.</p>
+                <h4>Mechanism</h4>
+                <p>Uploaded documents (PDF, TXT) are processed using <code>PyMuPDF</code>. The system utilizes a
+                    <strong>TF-IDF Vectorizer</strong> to generate sparse embeddings for text chunks. Upon query, a
+                    <strong>Cosine Similarity</strong> analysis is performed to retrieve the Top-K relevant segments for
+                    the neural context window.</p>
+                <h4>Constraints</h4>
+                <ul>
+                    <li><strong>Chunking:</strong> Default 400 words with a 50-word overlap.</li>
+                    <li><strong>Locality:</strong> Vector indices are stored in-memory and are not persisted to disk,
+                        ensuring zero-trace document analysis.</li>
+                </ul>
+
+                <h2 id="search">04 Agentic Search</h2>
+                <p>The system features an autonomous search capability where the model itself decides when to access
+                    external information.</p>
+                <h4>Operational Flow</h4>
+                <ol>
+                    <li>The model generates a <code>[SEARCH: query]</code> token if it identifies a factual gap.</li>
+                    <li>The backend triggers the <code>web_search</code> utility.</li>
+                    <li>Results are injected into the system prompt as <code>[SEARCH RESULTS]</code>.</li>
+                    <li>The model completes its reasoning based on the retrieved context.</li>
+                </ol>
                 <div class="alert">
-                    <strong>SYSTEM NOTE:</strong> High-performance inference requires local GPU drivers (CUDA/Metal).
-                    Ensure hardware-specific acceleration is active.
+                    <strong>DEEP SEARCH:</strong> Enabling Deep Search mode triggers a query decomposition algorithm
+                    that spawns multiple sub-queries to map complex information landscapes.
                 </div>
 
-                <h2 id="models">03 Model Depot</h2>
-                <p>Access weights through the integrated downloader. Supports standard GGUF quantization formats.</p>
+                <h2 id="models">05 Model Management</h2>
+                <p>Cognito supports the <strong>GGUF</strong> (GPT-Generated Unified Format) standard. </p>
+                <ul>
+                    <li><strong>Quantization:</strong> Recommended <code>Q4_K_M</code> or <code>Q5_K_M</code> for
+                        optimal performance-to-vRAM ratio.</li>
+                    <li><strong>Acceleration:</strong> Backends are pre-configured for <code>Metal</code> (Apple
+                        Silicon) and <code>CUDA</code> (NVIDIA). Hardware layers are automatically mapped during model
+                        load.</li>
+                </ul>
 
-                <h2 id="features">04 Capabilities</h2>
-                <p>Engineered for high-autonomy research tasks. Features include full-text PDF analysis and real-time
-                    web context injection via automated agents.</p>
+                <h2 id="api">06 API Reference</h2>
+                <p>The internal intelligence service exposes the following endpoints for developers:</p>
 
-                <h2 id="troubleshooting">05 Debugging</h2>
-                <p>Verify virtual environment status if backend connection is lost. Check system logs for neural state
-                    errors.</p>
+                <h4>Model Control</h4>
+                <p><span class="api-endpoint">POST</span><code>/v1/load_model</code><br>Loads a GGUF file into the
+                    neural execution engine.</p>
+
+                <h4>Inference</h4>
+                <p><span class="api-endpoint">POST</span><code>/v1/chat/completions</code><br>Standard OpenAI-compatible
+                    chat endpoint supporting streaming and agentic flags.</p>
+
+                <h4>Knowledge System</h4>
+                <p><span class="api-endpoint">GET</span><code>/v1/documents</code> — List active docs.<br>
+                    <span class="api-endpoint">POST</span><code>/v1/documents/upload</code> — Process new data source.
+                </p>
             </main>
         </div>
     </div>
+
+    <footer>
+        <div class="container" style="display: flex; justify-content: space-between;">
+            <p>© 2026 — COGNITO INTELLIGENCE SYSTEMS</p>
+            <p>OBJECTIVE REASONING — LOCAL CONTROL</p>
+        </div>
+    </footer>
 </body>
 
 </html>
