@@ -45,11 +45,28 @@ A fully local AI assistant that runs on your machine. No cloud, no data collecti
 ## 🛠️ Installation
 
 ### Prerequisites
-- **Node.js** 18+ and npm
-- **Python** 3.10+
-- For GPU acceleration:
-  - macOS: Apple Silicon (M1/M2/M3) - works out of the box
-  - Linux/Windows: NVIDIA GPU with CUDA
+
+#### 1. Node.js (v18+)
+- **Check if installed:**
+  ```bash
+  node --version
+  ```
+- **Install:**
+  - [Download Node.js](https://nodejs.org/) (LTS recommended)
+  - Or use a version manager like `nvm` (Mac/Linux) or `nvm-windows`.
+
+#### 2. Python (v3.10+)
+- **Check if installed:**
+  ```bash
+  python --version  # or python3 --version
+  ```
+- **Install:**
+  - [Download Python](https://www.python.org/downloads/)
+  - **Windows Users:** Make sure to check "Add Python to PATH" during installation.
+
+#### 3. GPU Acceleration (Optional but Recommended)
+- **macOS:** Apple Silicon (M1/M2/M3) works out of the box.
+- **Windows/Linux:** NVIDIA GPU with CUDA drivers installed.
 
 ### Quick Start
 

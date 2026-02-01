@@ -4,419 +4,536 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cognito - Private. Local. Fast.</title>
+    <title>Cognito // SYSTEM_ONLINE</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap"
+        rel="stylesheet">
     <style>
+        :root {
+            --bg-dark: #050510;
+            --neon-pink: #ff00ff;
+            --neon-cyan: #00ffff;
+            --neon-purple: #bd00ff;
+            --grid-color: rgba(189, 0, 255, 0.2);
+            --text-glow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        :root {
-            --bg-primary: #0a0a0f;
-            --bg-secondary: #111118;
-            --text-primary: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --accent: #8b5cf6;
-            --accent-glow: rgba(139, 92, 246, 0.3);
-        }
-
         body {
-            font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
+            background-color: var(--bg-dark);
+            color: #fff;
+            font-family: 'Share Tech Mono', monospace;
             overflow-x: hidden;
+            min-height: 100vh;
         }
 
-        /* Gradient background */
-        .bg-gradient {
+        /* Scanline Overlay */
+        .scanlines {
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background:
-                radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
-                var(--bg-primary);
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom,
+                    rgba(255, 255, 255, 0),
+                    rgba(255, 255, 255, 0) 50%,
+                    rgba(0, 0, 0, 0.2) 50%,
+                    rgba(0, 0, 0, 0.2));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 1000;
+            /* Subtle CRT flicker */
+            animation: flicker 0.15s infinite;
+            opacity: 0.3;
+        }
+
+        /* Retro Grid Background - Animated */
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            perspective: 1000px;
             z-index: -1;
+            overflow: hidden;
+        }
+
+        .grid-floor {
+            position: absolute;
+            bottom: -25%;
+            left: -50%;
+            width: 200%;
+            height: 100%;
+            background-image:
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 50px 50px;
+            transform: rotateX(60deg);
+            animation: gridMove 20s linear infinite;
+            mask-image: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 60%);
+            -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 60%);
+        }
+
+        .grid-sky {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 60%;
+            background: radial-gradient(circle at bottom, #1a0b2e 0%, var(--bg-dark) 70%);
         }
 
         /* Navigation */
         nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            padding: 20px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            backdrop-filter: blur(20px);
-            background: rgba(10, 10, 15, 0.8);
+            padding: 20px 40px;
+            position: fixed;
+            top: 0;
+            width: 100%;
             z-index: 100;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(5, 5, 16, 0.8);
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid var(--neon-purple);
+            box-shadow: 0 0 15px rgba(189, 0, 255, 0.3);
         }
 
         .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 1.5rem;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 0px var(--neon-pink);
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-size: 1.5rem;
-            font-weight: 700;
-            letter-spacing: 0.05em;
+            gap: 10px;
         }
 
         .logo img {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-        }
-
-        .hero-logo {
-            width: 160px;
-            height: 160px;
-            margin-bottom: 24px;
-            border-radius: 32px;
-            box-shadow: 0 12px 48px rgba(139, 92, 246, 0.4);
-            object-fit: cover;
+            width: 35px;
+            height: 35px;
+            border: 2px solid var(--neon-cyan);
+            border-radius: 4px;
+            box-shadow: 0 0 10px var(--neon-cyan);
         }
 
         .nav-links {
             display: flex;
-            gap: 32px;
+            gap: 30px;
         }
 
         .nav-links a {
-            color: var(--text-secondary);
+            color: var(--neon-cyan);
             text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.2s;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+            position: relative;
         }
 
         .nav-links a:hover {
-            color: var(--text-primary);
+            color: #fff;
+            text-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--neon-pink);
+            transition: 0.3s;
+            box-shadow: 0 0 10px var(--neon-pink);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
         }
 
         /* Hero Section */
         .hero {
-            min-height: 100vh;
+            height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 120px 20px 80px;
+            position: relative;
+            padding-top: 60px;
         }
 
-        .hero h1 {
-            font-size: clamp(3rem, 8vw, 6rem);
-            font-weight: 700;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, #f1f5f9 0%, #94a3b8 50%, #f1f5f9 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        .hero-video {
+            width: 180px;
+            height: 180px;
+            border: 4px solid var(--neon-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 30px var(--neon-cyan), inset 0 0 20px var(--neon-cyan);
+            object-fit: cover;
+            margin-bottom: 30px;
+            background: #000;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 4.5rem;
+            font-weight: 900;
+            letter-spacing: 5px;
+            margin-bottom: 10px;
+            position: relative;
+            color: #fff;
+            text-shadow: 3px 3px 0px var(--neon-purple), -2px -2px 0px var(--neon-cyan);
+            animation: glitchText 3s infinite alternate-reverse;
         }
 
         .tagline {
-            font-size: clamp(1.2rem, 3vw, 1.8rem);
-            color: var(--text-secondary);
-            margin-bottom: 24px;
-            font-weight: 300;
-        }
-
-        .tagline span {
-            color: var(--accent);
+            font-size: 1.8rem;
+            color: var(--neon-pink);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px var(--neon-pink);
         }
 
         .description {
             max-width: 600px;
-            font-size: 1.1rem;
-            color: var(--text-secondary);
-            margin-bottom: 48px;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            color: #e0e0e0;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border: 1px solid var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
         }
 
-        /* Download Buttons */
-        .download-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .download-btn {
+        /* Cyber Button */
+        .cyber-btn {
+            background: transparent;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            padding: 15px 40px;
+            border: 2px solid var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: 0.3s;
+            text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 12px;
-            padding: 16px 32px;
-            background: linear-gradient(135deg, var(--accent), #6366f1);
-            color: white;
-            text-decoration: none;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            transition: all 0.3s;
-            box-shadow: 0 4px 24px var(--accent-glow);
+            gap: 10px;
+            clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
         }
 
-        .download-btn:hover {
+        .cyber-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.4), transparent);
+            transition: 0.5s;
+        }
+
+        .cyber-btn:hover {
+            background: rgba(0, 255, 255, 0.1);
+            text-shadow: 0 0 10px #fff;
             transform: translateY(-2px);
-            box-shadow: 0 8px 32px var(--accent-glow);
+            box-shadow: 0 0 30px var(--neon-cyan);
         }
 
-        .download-btn svg {
-            width: 24px;
-            height: 24px;
-        }
-
-        .other-downloads {
-            display: flex;
-            gap: 16px;
-            margin-top: 8px;
-        }
-
-        .other-downloads a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.9rem;
-            padding: 8px 16px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            transition: all 0.2s;
-        }
-
-        .other-downloads a:hover {
-            border-color: rgba(255, 255, 255, 0.2);
-            color: var(--text-primary);
-        }
-
-        .coming-soon-badge {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            padding: 8px 16px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.01);
+        .cyber-btn:hover::before {
+            left: 100%;
         }
 
         .version {
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            margin-top: 16px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: var(--neon-purple);
+            text-transform: uppercase;
         }
 
         /* Screenshot */
         .screenshot-container {
-            margin-top: 80px;
-            max-width: 1000px;
             width: 90%;
-            border-radius: 16px;
+            max-width: 1000px;
+            margin-top: 40px;
+            border: 2px solid var(--neon-purple);
+            box-shadow: 0 0 30px rgba(189, 0, 255, 0.3);
+            position: relative;
             overflow: hidden;
-            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .screenshot-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(189, 0, 255, 0.1) 0%, transparent 100%);
+            pointer-events: none;
         }
 
         .screenshot-container img {
             width: 100%;
             display: block;
+            filter: contrast(1.1) brightness(0.9);
         }
 
-        .screenshot-placeholder {
-            width: 100%;
-            height: 500px;
-            background: var(--bg-secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-secondary);
-        }
-
-        /* Features Section */
+        /* Features */
         .features {
-            padding: 120px 20px;
+            padding: 80px 20px;
             max-width: 1200px;
             margin: 0 auto;
+            position: relative;
         }
 
-        .features h2 {
+        h2.section-title {
+            font-family: 'Orbitron', sans-serif;
             text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 64px;
+            font-size: 3rem;
+            color: #fff;
+            margin-bottom: 60px;
+            text-shadow: 0 0 15px var(--neon-cyan);
+            text-transform: uppercase;
         }
 
         .features-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 32px;
+            gap: 40px;
         }
 
         .feature-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            padding: 32px;
-            transition: all 0.3s;
+            background: rgba(10, 10, 25, 0.7);
+            border: 1px solid var(--neon-purple);
+            padding: 30px;
+            position: relative;
+            transition: 0.3s;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(189, 0, 255, 0.1);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--neon-pink);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: 0.3s;
         }
 
         .feature-card:hover {
-            border-color: rgba(139, 92, 246, 0.3);
-            transform: translateY(-4px);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 0 25px rgba(189, 0, 255, 0.4);
+            border-color: var(--neon-pink);
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
         }
 
         .feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: 16px;
+            font-size: 3rem;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 5px var(--neon-cyan));
         }
 
         .feature-card h3 {
-            font-size: 1.3rem;
-            margin-bottom: 12px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: var(--neon-cyan);
         }
 
         .feature-card p {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
+            color: #ccc;
+            line-height: 1.5;
         }
 
         /* Footer */
         footer {
-            padding: 48px 20px;
             text-align: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        footer a {
-            color: var(--accent);
-            text-decoration: none;
+            padding: 50px 20px;
+            border-top: 1px solid var(--neon-cyan);
+            background: #020205;
+            position: relative;
+            z-index: 10;
         }
 
         footer p {
-            color: var(--text-secondary);
+            color: var(--neon-purple);
+            text-transform: uppercase;
             font-size: 0.9rem;
+            letter-spacing: 1px;
         }
 
-        /* Responsive */
+        footer a {
+            color: #fff;
+            text-decoration: none;
+            border-bottom: 1px solid var(--neon-pink);
+        }
+
+        /* Animations */
+        @keyframes gridMove {
+            0% {
+                transform: rotateX(60deg) translateY(0);
+            }
+
+            100% {
+                transform: rotateX(60deg) translateY(50px);
+            }
+        }
+
+        @keyframes glitchText {
+            0% {
+                text-shadow: 3px 3px 0px var(--neon-purple), -2px -2px 0px var(--neon-cyan);
+            }
+
+            20% {
+                text-shadow: -3px -3px 0px var(--neon-purple), 2px 2px 0px var(--neon-cyan);
+            }
+
+            40% {
+                text-shadow: 2px -2px 0px var(--neon-purple), -2px 2px 0px var(--neon-cyan);
+            }
+
+            100% {
+                text-shadow: 3px 3px 0px var(--neon-purple), -2px -2px 0px var(--neon-cyan);
+            }
+        }
+
         @media (max-width: 768px) {
-            nav {
-                padding: 16px 20px;
+            h1 {
+                font-size: 2.5rem;
             }
 
             .nav-links {
                 display: none;
             }
 
-            .other-downloads {
-                flex-direction: column;
+            .hero-video {
+                width: 120px;
+                height: 120px;
+            }
+
+            .grid-floor {
+                bottom: -10%;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="bg-gradient"></div>
+    <div class="scanlines"></div>
+    <div class="grid-bg">
+        <div class="grid-sky"></div>
+        <div class="grid-floor"></div>
+    </div>
 
     <nav>
         <div class="logo">
-            <img src="logo.png" alt="Cognito">
+            <img src="logo.png" alt="Cognito Logo">
             COGNITO
         </div>
         <div class="nav-links">
-            <a href="#features">Features</a>
-            <a href="https://github.com/ArjunDeshwal/cognitoai">GitHub</a>
-            <a href="https://github.com/ArjunDeshwal/cognitoai/releases">Releases</a>
+            <a href="#features">Builds</a>
+            <a href="docs.html">Protocols</a>
+            <a href="https://github.com/ArjunDeshwal/cognitoai">Source_Code</a>
         </div>
     </nav>
 
     <section class="hero">
-        <video autoplay loop muted playsinline class="hero-logo">
+        <video autoplay loop muted playsinline class="hero-video">
             <source src="logo.mp4" type="video/mp4">
         </video>
         <h1>COGNITO</h1>
-        <p class="tagline"><span>Private.</span> Local. Fast.</p>
-        <p class="description">
-            Your open-source ChatGPT replacement that runs entirely on your machine. No cloud, no data collection, no
-            subscriptions. Your conversations stay yours.
-        </p>
+        <p class="tagline">Private. Local. <span style="color: var(--neon-cyan);">Unrestricted.</span></p>
+        <div class="description">
+            <p>Access neural networks directly on your hardware.</p>
+            <p>No Cloud. No Logs. Total Control.</p>
+        </div>
 
         <div class="download-section">
-            <!-- Primary download button - set to Coming Soon -->
-            <a href="javascript:void(0)" class="download-btn" id="main-download" style="cursor: default; opacity: 0.8;">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path
-                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+            <a href="https://github.com/ArjunDeshwal/cognitoai#installation" class="cyber-btn">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24" style="margin-right: 8px;">
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
                 </svg>
-                <span id="download-text">Coming Soon</span>
+                INITIATE_INSTALL
             </a>
-
-            <div class="other-downloads">
-                <span class="coming-soon-badge">macOS (Apple Silicon) - Coming Soon</span>
-                <span class="coming-soon-badge">macOS (Intel) - Coming Soon</span>
-                <span class="coming-soon-badge">Windows - Coming Soon</span>
-                <span class="coming-soon-badge">Linux - Coming Soon</span>
-            </div>
-
-            <p class="version">Version 1.0.0 · Pre-Alpha</p>
+            <p class="version">System Version 1.0.0 // Pre-Alpha</p>
         </div>
 
         <div class="screenshot-container">
-            <img src="screenshot.png" alt="Cognito Screenshot">
+            <img src="screenshot.png" alt="Cognito Interface">
         </div>
     </section>
 
     <section class="features" id="features">
-        <h2>Features</h2>
+        <h2 class="section-title">System Modules</h2>
         <div class="features-grid">
             <div class="feature-card">
                 <div class="feature-icon">🔒</div>
-                <h3>100% Private</h3>
-                <p>All inference runs locally on your hardware. No data ever leaves your machine. No API keys required.
-                </p>
+                <h3>Zero Tracking</h3>
+                <p>Inference runs on your local silicon. No data packets leave the subnet. Full operational privacy
+                    maintained.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">⚡</div>
-                <h3>Fast & Efficient</h3>
-                <p>Powered by llama.cpp for blazing fast inference. Supports Apple Silicon, NVIDIA GPUs, or CPU.</p>
+                <h3>Hyper-Fast</h3>
+                <p>Engineered with llama.cpp. Optimized for Apple Silicon & CUDA cores. Latency minimized.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">🔍</div>
-                <h3>Smart Web Search</h3>
-                <p>Built-in web search that the AI can use when needed. Get up-to-date information without leaving the
-                    app.</p>
+                <div class="feature-icon">🌐</div>
+                <h3>Net Runner</h3>
+                <p>Autonomous web crawlers retrieve real-time data for enhanced context injection.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">📄</div>
-                <h3>Document Chat</h3>
-                <p>Upload PDFs and text files, then chat with your documents. Perfect for research and study.</p>
+                <h3>Data Link</h3>
+                <p>Upload PDFs and text logs. RAG protocols enabled for document analysis.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">⬇️</div>
-                <h3>Model Browser</h3>
-                <p>Browse and download models directly from Hugging Face. One-click install of any GGUF model.</p>
+                <div class="feature-icon">💾</div>
+                <h3>Model Depot</h3>
+                <p>Direct pipe to Hugging Face. One-click GGUF model extraction and deployment.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">🎨</div>
-                <h3>Modern Interface</h3>
-                <p>Beautiful dark-themed UI with chat history, session management, and customizable system prompts.</p>
+                <div class="feature-icon">🖥️</div>
+                <h3>Visual Core</h3>
+                <p>Sleek dark-mode interface designed for extended terminal sessions.</p>
             </div>
         </div>
     </section>
 
     <footer>
         <p>
-            Open source on <a href="https://github.com/ArjunDeshwal/cognitoai">GitHub</a> ·
-            Built with ❤️ for privacy
+            Open Source on <a href="https://github.com/ArjunDeshwal/cognitoai">GitHub</a> //
+            Built for the <span style="color: var(--neon-pink);">Resistance</span>
         </p>
     </footer>
-
-    <script>
-        // Download disabled - Placeholder text set to Coming Soon
-        document.getElementById('download-text').textContent = 'Coming Soon';
-    </script>
 </body>
 
 </html>

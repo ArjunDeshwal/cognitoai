@@ -37,3 +37,6 @@ Thumbs.db
 .logfire/logfire_credentials.json
 
 release
+backend/build/
+backend/dist/
+backend/*.spec
