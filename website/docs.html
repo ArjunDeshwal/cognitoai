@@ -8,17 +8,19 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap"
         rel="stylesheet">
     <style>
         :root {
-            --bg: #fdfdfd;
-            --fg: #111111;
-            --fg-secondary: #666666;
-            --accent: #ff4f00;
-            --border: #e0e0e0;
+            --bg: #f4f1ea;
+            --bg-accent: #ffffff;
+            --fg: #2c2c2c;
+            --fg-secondary: #5a5a5a;
+            --accent: #4a5d4e;
+            --border: #d8d0c0;
+            --radius: 12px;
             --grid-unit: 24px;
-            --code-bg: #f5f5f5;
+            --code-bg: #e9e5db;
         }
 
         * {
@@ -31,32 +33,32 @@
         body {
             background-color: var(--bg);
             color: var(--fg);
-            font-family: 'Inter', sans-serif;
-            line-height: 1.5;
+            font-family: 'Instrument Sans', sans-serif;
+            line-height: 1.7;
         }
 
         .container {
             width: 100%;
-            max-width: 1440px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 0 calc(var(--grid-unit) * 2);
+            padding: 0 calc(var(--grid-unit) * 1.5);
         }
 
         /* Split Layout */
         .layout {
             display: grid;
             grid-template-columns: repeat(12, 1fr);
-            gap: var(--grid-unit);
+            gap: calc(var(--grid-unit) * 2);
             margin-top: calc(var(--grid-unit) * 4);
             margin-bottom: calc(var(--grid-unit) * 6);
         }
 
         nav {
-            padding: var(--grid-unit) 0;
+            padding: calc(var(--grid-unit) * 1.5) 0;
             border-bottom: 1px solid var(--border);
             position: sticky;
             top: 0;
-            background: rgba(253, 253, 253, 0.9);
+            background: rgba(244, 241, 234, 0.9);
             backdrop-filter: blur(10px);
             z-index: 100;
         }
@@ -68,42 +70,30 @@
         }
 
         .logo {
-            font-weight: 800;
-            font-size: 1.25rem;
-            letter-spacing: -0.02em;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: 1.75rem;
+            color: var(--fg);
+            text-decoration: none;
             display: flex;
             align-items: center;
             gap: 12px;
-            color: var(--fg);
-            text-decoration: none;
         }
 
-        .logo-box {
-            width: 32px;
-            height: 32px;
+        .logo-mark {
+            width: 28px;
+            height: 28px;
             background: var(--accent);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 0.8rem;
-            font-weight: 900;
-        }
-
-        /* NAV LINKS FIX - Corrected from neon-cyan to Swiss theme variables */
-        .nav-links {
-            display: flex;
-            gap: calc(var(--grid-unit) * 1.5);
+            border-radius: 50%;
         }
 
         .nav-links a {
             text-decoration: none;
             color: var(--fg);
-            font-weight: 600;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            transition: color 0.2s;
+            font-weight: 500;
+            font-size: 1rem;
+            margin-left: 24px;
+            transition: color 0.3s;
         }
 
         .nav-links a:hover {
@@ -114,9 +104,8 @@
         aside {
             grid-column: 1 / span 3;
             position: sticky;
-            top: 100px;
-            height: calc(100vh - 100px);
-            border-right: 1px solid var(--border);
+            top: 120px;
+            height: calc(100vh - 120px);
             padding-right: var(--grid-unit);
         }
 
@@ -129,67 +118,66 @@
         .sidebar-links a {
             text-decoration: none;
             color: var(--fg-secondary);
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s;
             padding: 4px 0;
-            transition: color 0.2s;
         }
 
         .sidebar-links a:hover {
-            color: var(--fg);
+            color: var(--accent);
+            transform: translateX(4px);
+        }
+
+        .sidebar-links a.active {
+            color: var(--accent);
+            font-weight: 700;
         }
 
         /* Content */
         main {
-            grid-column: 4 / span 8;
-            max-width: 72ch;
+            grid-column: 4 / span 9;
+            max-width: 70ch;
         }
 
         h1,
         h2,
         h3,
         h4 {
-            font-family: 'Instrument Sans', sans-serif;
+            font-family: 'Playfair Display', serif;
             font-weight: 700;
-            letter-spacing: -0.02em;
-            text-transform: uppercase;
             margin-bottom: 24px;
+            color: var(--fg);
         }
 
         h1 {
-            font-size: 4rem;
+            font-size: 4.5rem;
             line-height: 1;
-            border-bottom: 4px solid var(--fg);
-            padding-bottom: 12px;
+            margin-bottom: 40px;
         }
 
         h2 {
-            font-size: 2rem;
+            font-size: 2.25rem;
             margin-top: 64px;
-            border-bottom: 1px solid var(--fg);
-            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
         }
 
         h3 {
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             margin-top: 32px;
             color: var(--accent);
         }
 
         h4 {
-            font-size: 1rem;
+            font-size: 1.1rem;
             margin-top: 24px;
-            color: var(--fg);
-            border-left: 3px solid var(--accent);
-            padding-left: 12px;
         }
 
         p {
             margin-bottom: 24px;
-            font-size: 1.1rem;
-            color: #333;
+            font-size: 1.15rem;
+            color: #444;
         }
 
         ul {
@@ -199,7 +187,7 @@
 
         li {
             margin-bottom: 12px;
-            list-style-type: square;
+            list-style-type: disc;
         }
 
         li::marker {
@@ -208,21 +196,22 @@
 
         /* Code */
         code {
-            font-family: ui-monospace, 'SFMono-Regular', 'Menlo', 'Monaco', 'Courier New', monospace;
+            font-family: ui-monospace, 'SFMono-Regular', monospace;
             background: var(--code-bg);
-            padding: 4px 8px;
-            border-radius: 2px;
-            font-size: 0.9rem;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 0.95rem;
             color: var(--accent);
         }
 
         pre {
-            background: var(--fg);
-            color: white;
-            padding: var(--grid-unit);
+            background: #2c2c2c;
+            color: #ececec;
+            padding: calc(var(--grid-unit) * 1.2);
+            border-radius: var(--radius);
             overflow-x: auto;
             margin-bottom: 32px;
-            border-left: 8px solid var(--accent);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
 
         pre code {
@@ -231,21 +220,35 @@
             padding: 0;
         }
 
-        .alert {
-            background: #fff8f5;
-            border: 1px solid var(--border);
-            border-left: 4px solid var(--accent);
+        .note {
+            background: #fff;
+            border-radius: var(--radius);
             padding: 24px;
             margin: 32px 0;
-            font-size: 1rem;
+            border: 1px solid var(--border);
+            border-left: 6px solid var(--accent);
         }
 
-        .api-endpoint {
-            font-family: ui-monospace, monospace;
-            background: #eee;
-            padding: 4px 8px;
+        .api-tag {
+            font-family: 'Instrument Sans', sans-serif;
+            font-size: 0.75rem;
             font-weight: 700;
-            margin-right: 8px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            margin-right: 12px;
+            background: #eee;
+            vertical-align: middle;
+        }
+
+        .tag-post {
+            background: #e8f0eb;
+            color: #4a5d4e;
+        }
+
+        .tag-get {
+            background: #eef2f5;
+            color: #4a749d;
         }
 
         @media (max-width: 1024px) {
@@ -257,8 +260,8 @@
                 grid-column: 1 / span 12;
             }
 
-            .nav-links {
-                display: none;
+            h1 {
+                font-size: 3.5rem;
             }
         }
     </style>
@@ -268,13 +271,13 @@
     <nav>
         <div class="container">
             <a href="index.html" class="logo">
-                <div class="logo-box">C</div>
-                COGNITO
+                <span class="logo-mark"></span>
+                Cognito
             </a>
             <div class="nav-links">
-                <a href="index.html">01 System</a>
-                <a href="docs.html" style="color: var(--accent)">02 Protocols</a>
-                <a href="https://github.com/ArjunDeshwal/cognitoai">03 Source</a>
+                <a href="index.html">Sanctuary</a>
+                <a href="docs.html" style="color: var(--accent)">Protocols</a>
+                <a href="https://github.com/ArjunDeshwal/cognitoai">Source</a>
             </div>
         </div>
     </nav>
@@ -283,121 +286,91 @@
         <div class="layout">
             <aside>
                 <div class="sidebar-links">
-                    <a href="#architecture">01 Architecture</a>
-                    <a href="#installation">02 Setup</a>
-                    <a href="#rag">03 Document RAG</a>
-                    <a href="#search">04 Agentic Search</a>
-                    <a href="#models">05 Model Management</a>
-                    <a href="#api">06 API Reference</a>
+                    <a href="#architecture">Foundation</a>
+                    <a href="#installation">Preparation</a>
+                    <a href="#rag">Knowledge Core</a>
+                    <a href="#search">External Senses</a>
+                    <a href="#models">Neural Weights</a>
+                    <a href="#api">Technical Interface</a>
                 </div>
             </aside>
 
             <main>
                 <h1>System Protocols</h1>
-                <p>Cognito is an objective workspace for local machine intelligence. This guide provides an exhaustive
-                    technical standard for the system's architecture and operation.</p>
+                <p>Cognito is a quiet sanctuary for neural exploration. This guide details the essential architecture
+                    and operational patterns required for absolute local autonomy.</p>
 
-                <h2 id="architecture">01 Architecture</h2>
-                <p>The system is built on a decoupled architecture composed of three primary layers:</p>
+                <h2 id="architecture">Foundation</h2>
+                <p>The system is built on a trinity of specialized layers, designed for modularity and silent
+                    performance:</p>
                 <ul>
-                    <li><strong>Application Layer:</strong> Electron-based container managing window lifecycle and IPC
-                        bridge.</li>
-                    <li><strong>Intelligence Layer:</strong> FastAPI backend localized to the host machine, wrapping
-                        <code>llama-cpp-python</code>.</li>
-                    <li><strong>Retrieval Layer:</strong> In-memory TF-IDF vectorization engine for document context and
-                        agentic web-search handlers.</li>
+                    <li><strong>Interface Layer (React/Electron):</strong> A serene, gesture-focused shell that manages
+                        the visual state and system bridge.</li>
+                    <li><strong>Inference Layer (FastAPI):</strong> A high-performance localized service that maps
+                        neural requests to <code>llama.cpp</code>.</li>
+                    <li><strong>Context Layer (RAG Engine):</strong> A sparse retrieval system that allows the model to
+                        "remember" and "sense" your private documents.</li>
                 </ul>
 
-                <h2 id="installation">02 Setup</h2>
-                <p>Cognito requires local runtime preparation. We favor source-level deployment to ensure system
-                    integrity and auditability.</p>
+                <h2 id="installation">Preparation</h2>
+                <p>Deployment is a ritual of setting up a clean, isolated environment. We recommend source-based builds
+                    for total visibility.</p>
 
                 <h3>Prerequisites</h3>
                 <ul>
-                    <li><strong>Node.js (v18.0.0+)</strong>: Required for the React interface.</li>
-                    <li><strong>Python (v3.10.0+)</strong>: Required for neural weights processing and API services.
-                    </li>
-                    <li><strong>Build Tools</strong>: C++ compiler (Xcode on Mac, VS Build Tools on Windows) for
-                        compiling <code>llama-cpp</code> bindings.</li>
+                    <li><strong>Node.js (v18+)</strong>: The engine for our digital interface.</li>
+                    <li><strong>Python (v3.10+)</strong>: The core processing runtime.</li>
+                    <li><strong>C++ Compiler</strong>: Essential for binding the neural engine to your specific hardware
+                        (Metal/CUDA).</li>
                 </ul>
 
-                <h3>Initial Boot Sequence</h3>
-                <pre><code># Protocol 01: Remote Data Acquisition
-git clone https://github.com/ArjunDeshwal/cognitoai.git
-cd cognitoai
-
-# Protocol 02: Intelligence Environment
-python -m venv venv
-# Unix: source venv/bin/activate | Win: venv\Scripts\activate
-pip install -r backend/requirements.txt
-
-# Protocol 03: Interface Deployment
-cd app
-npm install
-npm run electron:dev</code></pre>
-
-                <h2 id="rag">03 Document RAG</h2>
-                <p>Cognito implements a Retrieval-Augmented Generation (RAG) system for local knowledge injection.</p>
-                <h4>Mechanism</h4>
-                <p>Uploaded documents (PDF, TXT) are processed using <code>PyMuPDF</code>. The system utilizes a
-                    <strong>TF-IDF Vectorizer</strong> to generate sparse embeddings for text chunks. Upon query, a
-                    <strong>Cosine Similarity</strong> analysis is performed to retrieve the Top-K relevant segments for
-                    the neural context window.</p>
-                <h4>Constraints</h4>
-                <ul>
-                    <li><strong>Chunking:</strong> Default 400 words with a 50-word overlap.</li>
-                    <li><strong>Locality:</strong> Vector indices are stored in-memory and are not persisted to disk,
-                        ensuring zero-trace document analysis.</li>
-                </ul>
-
-                <h2 id="search">04 Agentic Search</h2>
-                <p>The system features an autonomous search capability where the model itself decides when to access
-                    external information.</p>
-                <h4>Operational Flow</h4>
-                <ol>
-                    <li>The model generates a <code>[SEARCH: query]</code> token if it identifies a factual gap.</li>
-                    <li>The backend triggers the <code>web_search</code> utility.</li>
-                    <li>Results are injected into the system prompt as <code>[SEARCH RESULTS]</code>.</li>
-                    <li>The model completes its reasoning based on the retrieved context.</li>
-                </ol>
-                <div class="alert">
-                    <strong>DEEP SEARCH:</strong> Enabling Deep Search mode triggers a query decomposition algorithm
-                    that spawns multiple sub-queries to map complex information landscapes.
+                <h2 id="rag">Knowledge Core</h2>
+                <p>The RAG (Retrieval-Augmented Generation) engine allows for seamless document integration without
+                    cloud dependencies.</p>
+                <div class="note">
+                    <strong>Wabi-Sabi Retrieval:</strong> Our TF-IDF engine values simplicity and speed. It maps your
+                    documents to an in-memory vector space, ensuring zero-trace persistence after the sanctuary is
+                    closed.
                 </div>
+                <p>Default parameters focus on balanced digestion: 400-word segments with soft 50-word overlaps to
+                    maintain narrative continuity.</p>
 
-                <h2 id="models">05 Model Management</h2>
-                <p>Cognito supports the <strong>GGUF</strong> (GPT-Generated Unified Format) standard. </p>
-                <ul>
-                    <li><strong>Quantization:</strong> Recommended <code>Q4_K_M</code> or <code>Q5_K_M</code> for
-                        optimal performance-to-vRAM ratio.</li>
-                    <li><strong>Acceleration:</strong> Backends are pre-configured for <code>Metal</code> (Apple
-                        Silicon) and <code>CUDA</code> (NVIDIA). Hardware layers are automatically mapped during model
-                        load.</li>
-                </ul>
+                <h2 id="search">External Senses</h2>
+                <p>Cognito features an <strong>Agentic Search</strong> capability. This is not a manual tool, but a
+                    sensory organ that the model uses when it identifies a gap in its internal weights.</p>
+                <pre><code>// The model triggers a sense check:
+[SEARCH: specific inquiry]</code></pre>
+                <p>The system then brings back mists of external data, which are distilled and presented to the model
+                    for final reasoning.</p>
 
-                <h2 id="api">06 API Reference</h2>
-                <p>The internal intelligence service exposes the following endpoints for developers:</p>
+                <h2 id="models">Neural Weights</h2>
+                <p>We embrace the <strong>GGUF</strong> format. For a harmonious experience, we recommend 4-bit or 5-bit
+                    quantization (Q4_K_M), which offers high intelligence with a gentle footprint on system memory.</p>
 
-                <h4>Model Control</h4>
-                <p><span class="api-endpoint">POST</span><code>/v1/load_model</code><br>Loads a GGUF file into the
-                    neural execution engine.</p>
+                <h2 id="api">Technical Interface</h2>
+                <p>For those who wish to build on top of this sanctuary, the following protocols are exposed:</p>
 
-                <h4>Inference</h4>
-                <p><span class="api-endpoint">POST</span><code>/v1/chat/completions</code><br>Standard OpenAI-compatible
-                    chat endpoint supporting streaming and agentic flags.</p>
+                <h3>Neural Control</h3>
+                <p><span class="api-tag tag-post">POST</span><code>/v1/load_model</code><br>Injects a specific model
+                    path into the execution core.</p>
 
-                <h4>Knowledge System</h4>
-                <p><span class="api-endpoint">GET</span><code>/v1/documents</code> — List active docs.<br>
-                    <span class="api-endpoint">POST</span><code>/v1/documents/upload</code> — Process new data source.
+                <h3>Communication</h3>
+                <p><span class="api-tag tag-post">POST</span><code>/v1/chat/completions</code><br>The primary flow for
+                    streaming thought and agentic discovery.</p>
+
+                <h3>Knowledge Sources</h3>
+                <p><span class="api-tag tag-get">GET</span><code>/v1/documents</code> — List the garden's contents.<br>
+                    <span class="api-tag tag-post">POST</span><code>/v1/documents/upload</code> — Plant new information
+                    seeds.
                 </p>
             </main>
         </div>
     </div>
 
-    <footer>
-        <div class="container" style="display: flex; justify-content: space-between;">
-            <p>© 2026 — COGNITO INTELLIGENCE SYSTEMS</p>
-            <p>OBJECTIVE REASONING — LOCAL CONTROL</p>
+    <footer style="padding: 60px 0; background: #fff; border-top: 1px solid var(--border); margin-top: 100px;">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+            <p style="font-size: 0.9rem; margin: 0;">Cognito System Documentation. Built for the thoughtful mind.</p>
+            <p style="font-size: 0.9rem; margin: 0;">Est. 2026</p>
         </div>
     </footer>
 </body>
