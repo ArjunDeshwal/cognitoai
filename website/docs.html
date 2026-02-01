@@ -86,6 +86,8 @@
             gap: 12px;
             text-decoration: none;
             color: var(--fg);
+            position: relative;
+            z-index: 1001;
         }
 
         .logo-box {
@@ -94,6 +96,39 @@
             background: var(--accent);
             clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%);
         }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--fg-dim);
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: color 0.2s;
+        }
+
+        /* Mobile Toggle */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            cursor: pointer;
+            z-index: 1001;
+            padding: 10px;
+        }
+
+        .menu-toggle span {
+            width: 24px;
+            height: 2px;
+            background: var(--fg);
+            transition: 0.3s;
+        }
+
 
         /* Split Layout */
         .layout {
@@ -112,6 +147,7 @@
             height: calc(100vh - 120px);
             border-right: 1px solid var(--border);
             padding-right: var(--grid-unit);
+            overflow-y: auto;
         }
 
         .sidebar-links {
@@ -144,6 +180,7 @@
         /* Content */
         main {
             grid-column: 4 / span 9;
+            width: 100%;
             max-width: 72ch;
         }
 
@@ -157,7 +194,7 @@
         }
 
         h1 {
-            font-size: 4rem;
+            font-size: clamp(2.5rem, 8vw, 4rem);
             line-height: 1;
             border-bottom: 2px solid var(--accent);
             padding-bottom: 16px;
@@ -165,7 +202,7 @@
         }
 
         h2 {
-            font-size: 2rem;
+            font-size: clamp(1.5rem, 5vw, 2rem);
             margin-top: 64px;
             border-left: 4px solid var(--accent);
             padding-left: 20px;
@@ -212,6 +249,7 @@
             border: 1px solid var(--border);
             font-size: 0.9rem;
             color: var(--accent);
+            word-break: break-all;
         }
 
         pre {
@@ -256,16 +294,60 @@
         }
 
         @media (max-width: 900px) {
+            .layout {
+                display: flex;
+                flex-direction: column;
+                gap: 40px;
+            }
+
             aside {
-                display: none;
+                position: relative;
+                top: 0;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+                padding-bottom: 24px;
+                width: 100%;
+            }
+
+            .sidebar-links {
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 20px;
             }
 
             main {
                 grid-column: 1 / span 12;
             }
+        }
 
-            h1 {
-                font-size: 2.5rem;
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: flex;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 80%;
+                height: 100vh;
+                background: var(--bg);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 40px;
+                transition: 0.4s;
+                border-left: 2px solid var(--border);
+                z-index: 1000;
+            }
+
+            .nav-links.active {
+                right: 0;
+            }
+
+            .nav-links a {
+                font-size: 1.5rem;
             }
         }
     </style>
@@ -278,7 +360,13 @@
                 <div class="logo-box"></div>
                 <span class="mono" style="font-size: 1.1rem; font-weight: 900; color: var(--fg);">Cognito_OS</span>
             </a>
-            <div class="nav-links">
+            <div class="menu-toggle" id="mobile-menu-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <div class="nav-links" id="nav-links">
                 <a href="index.html">System_Home</a>
                 <a href="docs.html" style="color: var(--accent)">System_Docs</a>
                 <a href="https://github.com/ArjunDeshwal/cognitoai">Source_Access</a>
@@ -375,6 +463,24 @@ cd app && npm install && npm run electron:dev</code></pre>
                 LOCAL_CONTROL_PROTOCOL_ACTIVE</span>
         </div>
     </footer>
+    <script>
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const navLinks = document.getElementById('nav-links');
+
+        menuBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            const spans = menuBtn.getElementsByTagName('span');
+            if (navLinks.classList.contains('active')) {
+                spans[0].style.transform = 'rotate(45deg) translate(5px, 6px)';
+                spans[1].style.opacity = '0';
+                spans[2].style.transform = 'rotate(-45deg) translate(5px, -6px)';
+            } else {
+                spans[0].style.transform = 'none';
+                spans[1].style.opacity = '1';
+                spans[2].style.transform = 'none';
+            }
+        });
+    </script>
 </body>
 
 </html>
