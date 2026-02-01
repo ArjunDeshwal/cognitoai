@@ -4,26 +4,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cognito — Private Local Intelligence</title>
+    <title>Cognito — Private Machine Intelligence</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
         rel="stylesheet">
     <style>
         :root {
-            --bg: #f4f1ea;
-            /* Washi Paper */
-            --bg-accent: #e0d7c6;
-            /* Sand */
-            --fg: #2c2c2c;
-            /* Charcoal */
-            --fg-secondary: #5a5a5a;
-            --accent: #4a5d4e;
-            /* Bamboo Green */
-            --accent-hover: #3d4d41;
-            --border: #d8d0c0;
-            --radius: 12px;
+            --bg: #0a0a0c;
+            --bg-offset: #11111a;
+            --fg: #f5f5f7;
+            --fg-muted: #8e8e93;
+            --accent: #3d5afe;
+            /* Electric Cobalt */
+            --accent-secondary: #7c4dff;
+            /* Ultraviolet */
+            --border: rgba(255, 255, 255, 0.1);
             --grid-unit: 24px;
         }
 
@@ -37,68 +34,71 @@
         body {
             background-color: var(--bg);
             color: var(--fg);
-            font-family: 'Instrument Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             line-height: 1.6;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+            overflow-x: hidden;
         }
 
         .container {
             width: 100%;
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 0 calc(var(--grid-unit) * 1.5);
+            padding: 0 calc(var(--grid-unit) * 2);
         }
 
         section {
-            padding: calc(var(--grid-unit) * 5) 0;
+            padding: calc(var(--grid-unit) * 6) 0;
+            border-bottom: 1px solid var(--border);
         }
 
         /* Typography */
         h1,
         h2,
         h3 {
-            font-family: 'Playfair Display', serif;
-            font-weight: 600;
-            letter-spacing: -0.01em;
+            font-family: 'DM Serif Display', serif;
+            font-weight: 400;
         }
 
         h1 {
-            font-size: clamp(3.5rem, 10vw, 7rem);
-            line-height: 1.1;
+            font-size: clamp(4rem, 15vw, 11rem);
+            line-height: 0.9;
             margin-bottom: var(--grid-unit);
-            color: var(--fg);
+            letter-spacing: -0.02em;
         }
 
         h2 {
-            font-size: clamp(2.5rem, 5vw, 3.5rem);
-            margin-bottom: calc(var(--grid-unit) * 2);
-            position: relative;
-            display: inline-block;
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            line-height: 1.1;
+            margin-bottom: calc(var(--grid-unit) * 3);
+            font-style: italic;
         }
 
-        h2::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 0;
-            width: 60px;
-            height: 3px;
-            background: var(--accent);
-            border-radius: 2px;
+        h3 {
+            font-size: 1.75rem;
+            margin-bottom: 16px;
         }
 
         p {
-            font-size: 1.25rem;
-            max-width: 45ch;
-            color: var(--fg-secondary);
-            font-weight: 400;
+            font-size: 1.1rem;
+            max-width: 40ch;
+            color: var(--fg-muted);
+        }
+
+        .lead {
+            font-size: 1.5rem;
+            max-width: 32ch;
+            color: var(--fg);
+            margin-bottom: calc(var(--grid-unit) * 2);
         }
 
         /* Navigation */
         nav {
             padding: calc(var(--grid-unit) * 1.5) 0;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            background: rgba(10, 10, 12, 0.85);
+            backdrop-filter: blur(20px);
             z-index: 100;
         }
 
@@ -109,22 +109,11 @@
         }
 
         .logo {
-            font-family: 'Playfair Display', serif;
-            font-weight: 700;
+            font-family: 'DM Serif Display', serif;
             font-size: 1.75rem;
             color: var(--fg);
             text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo-mark {
-            width: 28px;
-            height: 28px;
-            background: var(--accent);
-            border-radius: 50%;
-            display: inline-block;
+            letter-spacing: -0.03em;
         }
 
         .nav-links {
@@ -134,183 +123,142 @@
 
         .nav-links a {
             text-decoration: none;
-            color: var(--fg);
-            font-weight: 500;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            position: relative;
+            color: var(--fg-muted);
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: color 0.3s;
         }
 
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 0;
-            height: 1px;
-            background: var(--accent);
-            transition: width 0.3s ease;
+        .nav-links a:hover {
+            color: var(--accent);
         }
 
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-
-        /* Hero Area */
+        /* Hero Layout */
         .hero {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-shape {
-            position: absolute;
-            top: 20%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(74, 93, 78, 0.08) 0%, rgba(244, 241, 234, 0) 70%);
-            z-index: -1;
-            filter: blur(40px);
-        }
-
-        .hero p {
-            margin: 0 auto calc(var(--grid-unit) * 2);
-        }
-
-        /* Buttons */
-        .cta-btn {
-            background: var(--accent);
-            color: #fff;
-            padding: 16px 40px;
-            border-radius: 40px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1.125rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 14px rgba(74, 93, 78, 0.25);
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .cta-btn:hover {
-            background: var(--accent-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(74, 93, 78, 0.3);
-        }
-
-        /* Features */
-        .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: calc(var(--grid-unit) * 2);
+            grid-template-columns: repeat(12, 1fr);
+            gap: var(--grid-unit);
+            align-items: end;
+            padding-top: calc(var(--grid-unit) * 4);
+        }
+
+        .hero-heading {
+            grid-column: 1 / span 10;
+        }
+
+        .hero-meta {
+            grid-column: 1 / span 4;
             margin-top: calc(var(--grid-unit) * 2);
         }
 
-        .feature-card {
-            background: #fff;
-            padding: calc(var(--grid-unit) * 2);
-            border-radius: var(--radius);
+        /* Video/Image Frame */
+        .cinematic-frame {
+            grid-column: 6 / span 7;
+            aspect-ratio: 4 / 5;
+            background: var(--bg-offset);
             border: 1px solid var(--border);
-            transition: all 0.4s ease;
             position: relative;
             overflow: hidden;
         }
 
-        .feature-card:hover {
-            transform: translateY(-8px);
-            border-color: var(--accent);
-            box-shadow: 0 12px 30px rgba(44, 44, 44, 0.05);
-        }
-
-        .feature-icon {
-            font-size: 1.5rem;
-            color: var(--accent);
-            margin-bottom: 20px;
-            display: block;
-        }
-
-        .feature-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 12px;
-            color: var(--fg);
-        }
-
-        .feature-card p {
-            font-size: 1rem;
-            line-height: 1.5;
-            color: var(--fg-secondary);
-        }
-
-        /* Image Showcase */
-        .showcase {
-            margin-top: calc(var(--grid-unit) * 4);
-            border-radius: var(--radius);
-            overflow: hidden;
-            box-shadow: 0 20px 50px rgba(44, 44, 44, 0.1);
-            border: 1px solid var(--border);
-        }
-
-        .showcase img {
+        .cinematic-frame img {
             width: 100%;
-            height: auto;
-            display: block;
-            transition: transform 0.8s ease;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.6;
+            filter: grayscale(1);
+            transition: all 0.8s ease;
         }
 
-        .showcase:hover img {
-            transform: scale(1.02);
+        .cinematic-frame:hover img {
+            opacity: 0.9;
+            filter: grayscale(0.5);
+            transform: scale(1.05);
+        }
+
+        /* Buttons */
+        .btn {
+            background: var(--accent);
+            color: #fff;
+            padding: 16px 32px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            display: inline-block;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: none;
+        }
+
+        .btn:hover {
+            background: var(--accent-secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(61, 90, 254, 0.3);
+        }
+
+        /* Grid Features */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: calc(var(--grid-unit) * 2);
+        }
+
+        .feature-item {
+            grid-column: span 6;
+            padding: calc(var(--grid-unit) * 2) 0;
+            border-top: 1px solid var(--border);
+        }
+
+        .feature-number {
+            font-family: 'DM Serif Display', serif;
+            font-size: 3rem;
+            color: var(--accent);
+            margin-bottom: 16px;
+            display: block;
+            opacity: 0.5;
         }
 
         /* Footer */
         footer {
-            margin-top: auto;
-            padding: calc(var(--grid-unit) * 3) 0;
-            background: #fff;
-            border-top: 1px solid var(--border);
+            padding: calc(var(--grid-unit) * 4) 0;
+            font-size: 0.8rem;
+            color: var(--fg-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
         }
 
         footer .container {
             display: flex;
             justify-content: space-between;
-            align-items: center;
         }
 
-        .copyright {
-            font-size: 0.9rem;
-            color: var(--fg-secondary);
-        }
-
-        .footer-links a {
+        footer a {
             color: var(--fg);
             text-decoration: none;
-            margin-left: 24px;
-            font-weight: 500;
-            font-size: 0.9rem;
+            font-weight: 800;
         }
 
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 3.5rem;
+        /* Mobile */
+        @media (max-width: 1024px) {
+            .hero-heading {
+                grid-column: 1 / span 12;
             }
 
-            .nav-links {
+            .cinematic-frame {
                 display: none;
             }
 
-            section {
-                padding: calc(var(--grid-unit) * 3) 0;
+            .hero-meta {
+                grid-column: 1 / span 12;
             }
 
-            footer .container {
-                flex-direction: column;
-                gap: 20px;
-                text-align: center;
+            .feature-item {
+                grid-column: span 12;
             }
         }
     </style>
@@ -319,88 +267,73 @@
 <body>
     <nav>
         <div class="container">
-            <a href="index.html" class="logo">
-                <span class="logo-mark"></span>
-                Cognito
-            </a>
+            <a href="index.html" class="logo">COGNITO.</a>
             <div class="nav-links">
-                <a href="#features">Philosophy</a>
+                <a href="#features">Analysis</a>
                 <a href="docs.html">Protocols</a>
-                <a href="https://github.com/ArjunDeshwal/cognitoai">Source</a>
+                <a href="https://github.com/ArjunDeshwal/cognitoai">Repository</a>
             </div>
         </div>
     </nav>
 
-    <main class="container">
-        <section class="hero">
-            <div class="hero-shape"></div>
-            <h1>A Zen Sanctuary for Neural Thought</h1>
-            <p>Private. Local. Harmonious. Cognito is a serene workspace for interacting with machine intelligence,
-                crafted with mindful simplicity.</p>
-            <a href="https://github.com/ArjunDeshwal/cognitoai#installation" class="cta-btn">
-                Enter the Sanctuary
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                    <polyline points="12 5 19 12 12 19"></polyline>
-                </svg>
-            </a>
+    <main>
+        <div class="container">
+            <section class="hero">
+                <div class="hero-heading">
+                    <span
+                        style="font-size: 0.75rem; font-weight: 800; color: var(--accent); margin-bottom: 16px; display: block; letter-spacing: 0.2em;">RESTRICTED
+                        ACCESS — v1.0</span>
+                    <h1>The Intelligence Dispatch</h1>
+                </div>
 
-            <div class="showcase">
-                <img src="screenshot.png" alt="Cognito Serene Interface">
-            </div>
-        </section>
+                <div class="hero-meta">
+                    <p class="lead">Private. Local. Unrestricted. A cinematic workstation for the next generation of
+                        machine intelligence research.</p>
+                    <a href="https://github.com/ArjunDeshwal/cognitoai#installation" class="btn">Initiate Connection</a>
+                </div>
 
-        <section id="features">
-            <h2>The Core Balance</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <span class="feature-icon">静</span>
-                    <h3>Absolute Privacy</h3>
-                    <p>Your data stays within your space. Local inference ensures that your thoughts remain yours alone,
-                        never touching the cloud.</p>
+                <div class="cinematic-frame">
+                    <img src="screenshot.png" alt="System Analysis">
                 </div>
-                <div class="feature-card">
-                    <span class="feature-icon">禅</span>
-                    <h3>Mindful Craft</h3>
-                    <p>A distraction-free environment optimized for focus. Designed to be a quiet companion for your
-                        research and creative flow.</p>
+            </section>
+
+            <section id="features">
+                <h2>The Research Standards</h2>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <span class="feature-number">01</span>
+                        <h3>Neural Locality</h3>
+                        <p>Total data sovereignty. All inference executes on local silicon, ensuring zero leakage and
+                            absolute privacy for sensitive research.</p>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-number">02</span>
+                        <h3>Agentic Discovery</h3>
+                        <p>Autonomous external sensing. The system identifies factual voids and independently scans
+                            global networks to refine its internal state.</p>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-number">03</span>
+                        <h3>Contextual Depth</h3>
+                        <p>Direct knowledge injection. Full-text document analysis via TF-IDF retrieval for enhanced
+                            reasoning across complex datasets.</p>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-number">04</span>
+                        <h3>Hardware Mastery</h3>
+                        <p>Optimized for Apple's Metal and NVIDIA's CUDA. High-efficiency GGUF quantization for
+                            real-time neural discovery.</p>
+                    </div>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-icon">流</span>
-                    <h3>Natural Growth</h3>
-                    <p>Integrate your own documents and knowledge. Watch your local neural garden expand as you feed it
-                        with meaningful context.</p>
-                </div>
-                <div class="feature-card">
-                    <span class="feature-icon">智</span>
-                    <h3>High Autonomy</h3>
-                    <p>Powered by efficient GGUF models. High-speed reasoning on local hardware, from Apple Silicon to
-                        NVIDIA RTX.</p>
-                </div>
-                <div class="feature-card">
-                    <span class="feature-icon">探</span>
-                    <h3>Gentle Exploration</h3>
-                    <p>Agentic search capabilities allow the system to look outward when needed, bringing external truth
-                        into your private sanctuary.</p>
-                </div>
-                <div class="feature-card">
-                    <span class="feature-icon">真</span>
-                    <h3>Objective Truth</h3>
-                    <p>Full control over the system's "temperament" and parameters. No hidden filters—just pure,
-                        unrestricted intelligence.</p>
-                </div>
-            </div>
-        </section>
+            </section>
+        </div>
     </main>
 
     <footer>
         <div class="container">
-            <p class="copyright">© 2026 — Cognito Intelligence Systems. Handcrafted for the mindful engineer.</p>
-            <div class="footer-links">
-                <a href="https://github.com/ArjunDeshwal/cognitoai">GitHub</a>
-                <a href="docs.html">Documentation</a>
-            </div>
+            <div>© 2026 — COGNITO INTELLIGENCE SYSTEMS</div>
+            <div>STATUS: <span style="color: var(--accent);">SECURE</span> | <a
+                    href="https://github.com/ArjunDeshwal/cognitoai">SOURCE CODE</a></div>
         </div>
     </footer>
 </body>
