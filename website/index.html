@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
         rel="stylesheet">
     <style>
         :root {
@@ -21,6 +21,9 @@
             --accent-rgb: 255, 176, 0;
             --border: #2a2d33;
             --grid-unit: 24px;
+            --glass-bg: rgba(22, 24, 27, 0.55);
+            --glass-border: rgba(235, 237, 240, 0.08);
+            --radius: 14px;
         }
 
         * {
@@ -28,6 +31,10 @@
             padding: 0;
             box-sizing: border-box;
             -webkit-font-smoothing: antialiased;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
@@ -48,8 +55,22 @@
             height: 100%;
             background-image: radial-gradient(var(--border) 1px, transparent 0);
             background-size: 40px 40px;
-            z-index: -1;
+            z-index: -2;
             opacity: 0.3;
+        }
+
+        /* Ambient glow field */
+        body::after {
+            content: '';
+            position: fixed;
+            top: -20%;
+            left: 50%;
+            width: 1200px;
+            height: 1200px;
+            transform: translateX(-50%);
+            background: radial-gradient(circle, rgba(var(--accent-rgb), 0.10) 0%, rgba(var(--accent-rgb), 0) 60%);
+            z-index: -1;
+            pointer-events: none;
         }
 
         .container {
@@ -98,14 +119,34 @@
             max-width: 48ch;
         }
 
+        /* Scroll reveal */
+        [data-reveal] {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        [data-reveal].in-view {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         /* Navigation */
         nav {
-            padding: var(--grid-unit) 0;
-            border-bottom: 2px solid var(--border);
-            background: var(--bg);
+            padding: calc(var(--grid-unit) * 0.75) 0;
+            border-bottom: 1px solid transparent;
+            background: rgba(15, 16, 18, 0.6);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             position: sticky;
             top: 0;
             z-index: 1000;
+            transition: border-color 0.3s, background 0.3s;
+        }
+
+        nav.scrolled {
+            border-bottom-color: var(--border);
+            background: rgba(15, 16, 18, 0.85);
         }
 
         nav .container {
@@ -129,10 +170,12 @@
             height: 24px;
             background: var(--accent);
             clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%);
+            box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.5);
         }
 
         .nav-links {
             display: flex;
+            align-items: center;
             gap: 32px;
         }
 
@@ -148,6 +191,20 @@
 
         .nav-links a:hover {
             color: var(--accent);
+        }
+
+        .nav-cta {
+            color: var(--accent) !important;
+            border: 1px solid var(--accent);
+            padding: 10px 18px;
+            border-radius: 6px;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+        }
+
+        .nav-cta:hover {
+            background: var(--accent);
+            color: #000 !important;
+            box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.35);
         }
 
         /* Mobile Menu Toggle */
@@ -191,15 +248,38 @@
         }
 
         /* Core Video Style */
-        .core-orb {
+        .core-orb-wrap {
+            position: relative;
             width: 100%;
             max-width: 450px;
             aspect-ratio: 1;
+        }
+
+        .core-orb-wrap::before {
+            content: '';
+            position: absolute;
+            inset: -40px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, rgba(var(--accent-rgb), 0.5), transparent 30%, transparent 70%, rgba(var(--accent-rgb), 0.5));
+            filter: blur(30px);
+            opacity: 0.5;
+            animation: spin-glow 12s linear infinite;
+        }
+
+        @keyframes spin-glow {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .core-orb {
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
             overflow: hidden;
             position: relative;
             border: 1px solid var(--accent);
-            box-shadow: 0 0 60px rgba(var(--accent-rgb), 0.15);
+            box-shadow: 0 0 80px rgba(var(--accent-rgb), 0.2), inset 0 0 60px rgba(0, 0, 0, 0.4);
             background: #000;
         }
 
@@ -207,19 +287,20 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            opacity: 0.8;
+            opacity: 0.85;
         }
 
         .status-badge {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 6px 12px;
-            background: rgba(var(--accent-rgb), 0.1);
-            border: 1px solid var(--accent);
+            padding: 8px 14px;
+            background: rgba(var(--accent-rgb), 0.08);
+            border: 1px solid rgba(var(--accent-rgb), 0.4);
             color: var(--accent);
             font-weight: 700;
-            border-radius: 4px;
+            border-radius: 999px;
+            backdrop-filter: blur(6px);
         }
 
         .pulse {
@@ -243,6 +324,13 @@
         }
 
         /* Buttons */
+        .btn-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 12px;
+        }
+
         .cta-btn {
             background: var(--accent);
             color: #000;
@@ -256,6 +344,8 @@
             gap: 12px;
             transition: all 0.2s;
             border: 2px solid transparent;
+            border-radius: 6px;
+            box-shadow: 0 0 0 rgba(var(--accent-rgb), 0);
         }
 
         .cta-btn:hover {
@@ -263,27 +353,124 @@
             color: var(--accent);
             border-color: var(--accent);
             transform: translate(4px, -4px);
-            box-shadow: -4px 4px 0 var(--accent);
+            box-shadow: -4px 4px 0 var(--accent), 0 0 30px rgba(var(--accent-rgb), 0.25);
         }
 
-        /* Modules Grid */
+        .cta-btn-ghost {
+            background: transparent;
+            color: var(--fg);
+            padding: 16px 32px;
+            text-decoration: none;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+        }
+
+        .cta-btn-ghost:hover {
+            border-color: var(--fg-dim);
+            background: rgba(255, 255, 255, 0.03);
+            transform: translate(4px, -4px);
+        }
+
+        /* Stats strip */
+        .stats-strip {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .stat-cell {
+            background: var(--glass-bg);
+            padding: 28px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-size: 0.7rem;
+            color: var(--fg-dim);
+        }
+
+        /* Modules Grid (Bento) */
         .modules-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(6, 1fr);
             gap: 24px;
             margin-top: 48px;
         }
 
         .module {
-            background: var(--bg-panel);
-            border: 1px solid var(--border);
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
             padding: 32px;
             position: relative;
-            transition: border-color 0.3s;
+            overflow: hidden;
+            transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+            grid-column: span 3;
+        }
+
+        .module.module-lg {
+            grid-column: span 4;
+        }
+
+        .module.module-sm {
+            grid-column: span 2;
+        }
+
+        .module::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(400px circle at 0% 0%, rgba(var(--accent-rgb), 0.08), transparent 60%);
+            opacity: 0;
+            transition: opacity 0.4s;
         }
 
         .module:hover {
-            border-color: var(--accent);
+            border-color: rgba(var(--accent-rgb), 0.5);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35), 0 0 30px rgba(var(--accent-rgb), 0.08);
+        }
+
+        .module:hover::before {
+            opacity: 1;
+        }
+
+        .module-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--accent);
+            margin-bottom: 20px;
+            background: rgba(var(--accent-rgb), 0.06);
         }
 
         .module-index {
@@ -295,6 +482,7 @@
             color: var(--fg-dim);
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.65rem;
+            border-radius: 0 var(--radius) 0 8px;
         }
 
         .module h3 {
@@ -303,9 +491,13 @@
             color: var(--fg);
         }
 
+        .module p {
+            max-width: 100%;
+        }
+
         /* Footer */
         footer {
-            border-top: 2px solid var(--border);
+            border-top: 1px solid var(--border);
             padding: 48px 0;
             background: #0a0b0d;
         }
@@ -338,9 +530,23 @@
             h1 {
                 font-size: clamp(3rem, 10vw, 6rem);
             }
+
+            .stats-strip {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .module,
+            .module.module-lg,
+            .module.module-sm {
+                grid-column: span 6;
+            }
         }
 
         @media (max-width: 768px) {
+            h1 {
+                font-size: clamp(2.2rem, 11vw, 4.5rem);
+            }
+
             .menu-toggle {
                 display: flex;
             }
@@ -386,9 +592,13 @@
                 margin-bottom: 24px;
             }
 
-            .core-orb {
+            .core-orb-wrap {
                 width: 280px;
                 max-width: 80vw;
+            }
+
+            .btn-row {
+                justify-content: center;
             }
 
             footer .container {
@@ -405,7 +615,7 @@
 </head>
 
 <body>
-    <nav>
+    <nav id="site-nav">
         <div class="container">
             <a href="index.html" class="logo">
                 <div class="logo-box"></div>
@@ -421,13 +631,14 @@
                 <a href="#modules">Protocols</a>
                 <a href="docs.html">Documentation</a>
                 <a href="https://github.com/ArjunDeshwal/cognitoai">Source</a>
+                <a href="https://github.com/ArjunDeshwal/cognitoai#installation" class="nav-cta">Get Started</a>
             </div>
         </div>
     </nav>
 
     <main class="container">
         <section class="hero">
-            <div class="hero-content">
+            <div class="hero-content" data-reveal>
                 <div class="status-badge">
                     <div class="pulse"></div>
                     <span class="mono">Neural Core: Active</span>
@@ -435,7 +646,7 @@
                 <h1>Private.<br>Local.<br><span style="color: var(--accent);">Unrestricted.</span></h1>
                 <p>Cognito is a sovereign machine intelligence node. Total compute autonomy, running exclusively on your
                     secure local hardware.</p>
-                <div style="margin-top: 12px;">
+                <div class="btn-row">
                     <a href="https://github.com/ArjunDeshwal/cognitoai#installation" class="cta-btn">
                         Initialize Node
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -444,49 +655,94 @@
                             <polyline points="12 5 19 12 12 19"></polyline>
                         </svg>
                     </a>
+                    <a href="docs.html" class="cta-btn-ghost">View Docs</a>
                 </div>
             </div>
 
-            <div class="hero-visual">
-                <div class="core-orb">
-                    <video autoplay muted loop playsinline>
-                        <source src="logo.mp4" type="video/mp4">
-                    </video>
+            <div class="hero-visual" data-reveal>
+                <div class="core-orb-wrap">
+                    <div class="core-orb">
+                        <video autoplay muted loop playsinline>
+                            <source src="logo.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section data-reveal>
+            <div class="stats-strip">
+                <div class="stat-cell">
+                    <span class="stat-value">0</span>
+                    <span class="stat-label">Bytes Transmitted</span>
+                </div>
+                <div class="stat-cell">
+                    <span class="stat-value">100%</span>
+                    <span class="stat-label">On-Device Compute</span>
+                </div>
+                <div class="stat-cell">
+                    <span class="stat-value">GGUF</span>
+                    <span class="stat-label">Metal / CUDA Accel</span>
+                </div>
+                <div class="stat-cell">
+                    <span class="stat-value">RAM</span>
+                    <span class="stat-label">Zero-Trace Indexing</span>
                 </div>
             </div>
         </section>
 
         <section id="modules">
-            <span class="mono" style="color: var(--accent); display: block; margin-bottom: 12px;">//
+            <span class="mono" style="color: var(--accent); display: block; margin-bottom: 12px;" data-reveal>//
                 System_Specifications_1.0</span>
-            <h2>Operations Module</h2>
+            <h2 data-reveal>Operations Module</h2>
             <div class="modules-grid">
-                <div class="module">
+                <div class="module module-lg" data-reveal>
                     <div class="module-index">MOD_01</div>
+                    <div class="module-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5l-8-3z"></path>
+                        </svg>
+                    </div>
                     <span class="mono"
                         style="color: var(--accent); margin-bottom: 8px; display: block;">Privacy_Lock</span>
                     <h3>Sovereign Inference</h3>
                     <p>Zero data transit. Your neural processing is locked to your machine. No telemetry, no cloud, no
                         compromise.</p>
                 </div>
-                <div class="module">
+                <div class="module module-sm" data-reveal>
                     <div class="module-index">MOD_02</div>
+                    <div class="module-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+                            <path d="M9 9h6v6H9z"></path>
+                        </svg>
+                    </div>
                     <span class="mono"
                         style="color: var(--accent); margin-bottom: 8px; display: block;">Compute_Sync</span>
                     <h3>Hardware Binding</h3>
-                    <p>Deep integration with Metal and CUDA. High-performance GGUF acceleration mapped directly to your
-                        local silicon.</p>
+                    <p>Deep integration with Metal and CUDA, mapped to local silicon.</p>
                 </div>
-                <div class="module">
+                <div class="module module-sm" data-reveal>
                     <div class="module-index">MOD_03</div>
+                    <div class="module-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                        </svg>
+                    </div>
                     <span class="mono"
                         style="color: var(--accent); margin-bottom: 8px; display: block;">RAG_Protocol</span>
                     <h3>Knowledge Archive</h3>
-                    <p>Ingest secure PDF and TXT archives. Local transformer-based retrieval for enhanced reasoning without cloud
-                        indexing.</p>
+                    <p>Ingest secure PDF/TXT archives with local retrieval, no cloud indexing.</p>
                 </div>
-                <div class="module">
+                <div class="module module-lg" data-reveal>
                     <div class="module-index">MOD_04</div>
+                    <div class="module-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="7"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </div>
                     <span class="mono"
                         style="color: var(--accent); margin-bottom: 8px; display: block;">Agent_Scan</span>
                     <h3>Agentic Sensory</h3>
@@ -525,6 +781,7 @@
     <script>
         const menuBtn = document.getElementById('mobile-menu-btn');
         const navLinks = document.getElementById('nav-links');
+        const siteNav = document.getElementById('site-nav');
 
         menuBtn.addEventListener('click', () => {
             navLinks.classList.toggle('active');
@@ -552,6 +809,23 @@
                 spans[2].style.transform = 'none';
             });
         });
+
+        // Glass nav on scroll
+        window.addEventListener('scroll', () => {
+            siteNav.classList.toggle('scrolled', window.scrollY > 10);
+        }, { passive: true });
+
+        // Scroll reveal
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in-view');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
+
+        document.querySelectorAll('[data-reveal]').forEach(el => revealObserver.observe(el));
     </script>
 </body>
 

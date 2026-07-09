@@ -40,3 +40,4 @@ release
 backend/build/
 backend/dist/
 backend/*.spec
+.gstack/

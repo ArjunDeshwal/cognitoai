@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
         rel="stylesheet">
     <style>
         :root {
@@ -17,9 +17,13 @@
             --fg: #ebedf0;
             --fg-dim: #888e96;
             --accent: #ffb000;
+            --accent-rgb: 255, 176, 0;
             --border: #2a2d33;
             --grid-unit: 24px;
             --code-bg: #000;
+            --glass-bg: rgba(22, 24, 27, 0.55);
+            --glass-border: rgba(235, 237, 240, 0.08);
+            --radius: 14px;
         }
 
         * {
@@ -27,6 +31,10 @@
             padding: 0;
             box-sizing: border-box;
             -webkit-font-smoothing: antialiased;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
@@ -46,8 +54,21 @@
             height: 100%;
             background-image: radial-gradient(var(--border) 1px, transparent 0);
             background-size: 40px 40px;
-            z-index: -1;
+            z-index: -2;
             opacity: 0.2;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: -10%;
+            left: 50%;
+            width: 1200px;
+            height: 1200px;
+            transform: translateX(-50%);
+            background: radial-gradient(circle, rgba(var(--accent-rgb), 0.08) 0%, rgba(var(--accent-rgb), 0) 60%);
+            z-index: -1;
+            pointer-events: none;
         }
 
         .container {
@@ -64,14 +85,33 @@
             font-size: 0.75rem;
         }
 
+        [data-reveal] {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        [data-reveal].in-view {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         /* Navigation */
         nav {
-            padding: var(--grid-unit) 0;
-            border-bottom: 2px solid var(--border);
-            background: var(--bg);
+            padding: calc(var(--grid-unit) * 0.75) 0;
+            border-bottom: 1px solid transparent;
+            background: rgba(15, 16, 18, 0.6);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             position: sticky;
             top: 0;
             z-index: 1000;
+            transition: border-color 0.3s, background 0.3s;
+        }
+
+        nav.scrolled {
+            border-bottom-color: var(--border);
+            background: rgba(15, 16, 18, 0.85);
         }
 
         nav .container {
@@ -95,6 +135,7 @@
             height: 24px;
             background: var(--accent);
             clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%);
+            box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.5);
         }
 
         .nav-links {
@@ -153,7 +194,7 @@
         .sidebar-links {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 4px;
         }
 
         .sidebar-links a {
@@ -164,17 +205,21 @@
             text-transform: uppercase;
             letter-spacing: 0.1em;
             font-family: 'JetBrains Mono', monospace;
-            transition: color 0.2s;
+            transition: color 0.2s, border-color 0.2s, background 0.2s;
+            border-left: 2px solid transparent;
+            padding: 10px 12px;
+            border-radius: 0 6px 6px 0;
         }
 
         .sidebar-links a:hover {
-            color: var(--accent);
+            color: var(--fg);
+            background: rgba(255, 255, 255, 0.03);
         }
 
         .sidebar-links a.active {
             color: var(--accent);
-            border-left: 2px solid var(--accent);
-            padding-left: 12px;
+            border-left-color: var(--accent);
+            background: rgba(var(--accent-rgb), 0.06);
         }
 
         /* Content */
@@ -247,6 +292,7 @@
             background: var(--bg-panel);
             padding: 2px 6px;
             border: 1px solid var(--border);
+            border-radius: 4px;
             font-size: 0.9rem;
             color: var(--accent);
             word-break: break-all;
@@ -257,9 +303,11 @@
             color: #ccc;
             padding: 24px;
             border: 1px solid var(--border);
+            border-radius: var(--radius);
             overflow-x: auto;
             margin-bottom: 40px;
             position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         }
 
         pre::after {
@@ -271,6 +319,7 @@
             padding: 4px 8px;
             font-size: 0.6rem;
             font-family: 'JetBrains Mono', monospace;
+            border-radius: 0 var(--radius) 0 8px;
         }
 
         pre code {
@@ -281,14 +330,18 @@
         }
 
         .sys-alert {
-            background: rgba(255, 176, 0, 0.05);
-            border: 1px solid var(--accent);
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(var(--accent-rgb), 0.35);
+            border-radius: var(--radius);
             padding: 32px;
             margin: 48px 0;
+            box-shadow: 0 0 30px rgba(var(--accent-rgb), 0.06);
         }
 
         footer {
-            border-top: 2px solid var(--border);
+            border-top: 1px solid var(--border);
             padding: 48px 0;
             background: #0a0b0d;
         }
@@ -313,7 +366,7 @@
             .sidebar-links {
                 flex-direction: row;
                 flex-wrap: wrap;
-                gap: 20px;
+                gap: 8px;
             }
 
             main {
@@ -354,7 +407,7 @@
 </head>
 
 <body>
-    <nav>
+    <nav id="site-nav">
         <div class="container">
             <a href="index.html" class="logo">
                 <div class="logo-box"></div>
@@ -377,7 +430,7 @@
     <div class="container">
         <div class="layout">
             <aside>
-                <div class="sidebar-links">
+                <div class="sidebar-links" id="sidebar-links">
                     <a href="#arch">SYS_ARCHITECTURE</a>
                     <a href="#boot">BOOT_SEQUENCE</a>
                     <a href="#knowledge">RETRIEVAL_RAG</a>
@@ -392,18 +445,18 @@
                 <p>Cognito is a functional, tactical workstation for sovereign intelligence. This documentation outlines
                     the exact technical standards for local deployment.</p>
 
-                <h2 id="arch">Architecture Overview</h2>
+                <h2 id="arch" data-reveal>Architecture Overview</h2>
                 <p>Designed for absolute locality, the stack is partitioned into three functional layers:</p>
                 <ul>
                     <li><strong>Command Shell (Electron/React):</strong> A tactical UI built for high-legibility and
                         local resource binding.</li>
                     <li><strong>Inference Core (FastAPI):</strong> The localized gateway service that maps neural
                         instructions to the <code>llama.cpp</code> engine.</li>
-                    <li><strong>Context Module (RAG):</strong> An in-memory retrieval engine using TF-IDF protocols to
-                        inject private knowledge archives into active context.</li>
+                    <li><strong>Context Module (RAG):</strong> An in-memory retrieval engine using transformer-based
+                        embeddings to inject private knowledge archives into active context.</li>
                 </ul>
 
-                <h2 id="boot">Boot Sequence</h2>
+                <h2 id="boot" data-reveal>Boot Sequence</h2>
                 <p>Node deployment requires an isolated environment. We explicitly support source-level builds to ensure
                     operational transparency.</p>
 
@@ -414,7 +467,7 @@
                     <li><strong>C++ Compiler</strong> (Hardware Layer Mapping: Metal/CUDA)</li>
                 </ul>
 
-                <pre><code># CLONE_SOURCE
+                <pre data-reveal><code># CLONE_SOURCE
 git clone https://github.com/ArjunDeshwal/cognitoai.git
 
 # INITIALIZE_VENV
@@ -425,24 +478,24 @@ pip install -r backend/requirements.txt
 # EXECUTE_INIT
 cd app && npm install && npm run electron:dev</code></pre>
 
-                <h2 id="knowledge">Retrieval RAG</h2>
+                <h2 id="knowledge" data-reveal>Retrieval RAG</h2>
                 <p>Local knowledge injection is handled via the <strong>Context Module</strong>. Artifacts (PDF/TXT) are
                     parsed and tokenized into 400-word segments.</p>
                 <p>Similarity is ranked via <strong>Cosine Weighting</strong> against the query vector, enabling the
                     model to retrieve specific excerpts without external indexing services.</p>
 
-                <div class="sys-alert">
+                <div class="sys-alert" data-reveal>
                     <h3 style="margin-top: 0;">SECURITY_NOTICE</h3>
                     <p style="margin-bottom: 0;">All RAG indexes are held exclusively in volatile RAM. No persistent
                         search database is created, ensuring a zero-trace operation for sensitive document analysis.</p>
                 </div>
 
-                <h2 id="agency">Agent Sensory</h2>
+                <h2 id="agency" data-reveal>Agent Sensory</h2>
                 <p>The system possesses <strong>Autonomous Discovery</strong> capabilities. When the neural core
                     identifies an information void, it initiates a <code>[SEARCH:]</code> protocol to scan global
                     networks.</p>
 
-                <h2 id="api">Command API</h2>
+                <h2 id="api" data-reveal>Command API</h2>
                 <p>Technical interfaces for direct node control:</p>
 
                 <h3>Neural Mounting</h3>
@@ -466,6 +519,7 @@ cd app && npm install && npm run electron:dev</code></pre>
     <script>
         const menuBtn = document.getElementById('mobile-menu-btn');
         const navLinks = document.getElementById('nav-links');
+        const siteNav = document.getElementById('site-nav');
 
         menuBtn.addEventListener('click', () => {
             navLinks.classList.toggle('active');
@@ -480,6 +534,41 @@ cd app && npm install && npm run electron:dev</code></pre>
                 spans[2].style.transform = 'none';
             }
         });
+
+        window.addEventListener('scroll', () => {
+            siteNav.classList.toggle('scrolled', window.scrollY > 10);
+        }, { passive: true });
+
+        // Scroll reveal
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in-view');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
+
+        document.querySelectorAll('[data-reveal]').forEach(el => revealObserver.observe(el));
+
+        // Active section highlighting in sidebar
+        const sidebarLinks = document.querySelectorAll('#sidebar-links a');
+        const sections = Array.from(sidebarLinks).map(link =>
+            document.getElementById(link.getAttribute('href').slice(1))
+        ).filter(Boolean);
+
+        const sectionObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const link = document.querySelector(`#sidebar-links a[href="#${entry.target.id}"]`);
+                if (!link) return;
+                if (entry.isIntersecting) {
+                    sidebarLinks.forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                }
+            });
+        }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+
+        sections.forEach(section => sectionObserver.observe(section));
     </script>
 </body>
 
