@@ -4,7 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Specs — Cognito Intelligence</title>
+    <title>Documentation — Cognito Local AI Assistant</title>
+    <meta name="description"
+        content="Technical documentation for Cognito: architecture, installation, the TF-IDF retrieval RAG pipeline, agentic web search, and the local API surface.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Documentation — Cognito Local AI Assistant">
+    <meta property="og:description"
+        content="Architecture, installation, retrieval RAG, agentic search, and API reference for Cognito, a fully local AI assistant.">
+    <meta property="og:image" content="screenshot.png">
+    <meta name="twitter:card" content="summary_large_image">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -452,8 +460,8 @@
                         local resource binding.</li>
                     <li><strong>Inference Core (FastAPI):</strong> The localized gateway service that maps neural
                         instructions to the <code>llama.cpp</code> engine.</li>
-                    <li><strong>Context Module (RAG):</strong> An in-memory retrieval engine using transformer-based
-                        embeddings to inject private knowledge archives into active context.</li>
+                    <li><strong>Context Module (RAG):</strong> An in-memory retrieval engine using TF-IDF vectorization
+                        and cosine similarity to inject private knowledge archives into active context.</li>
                 </ul>
 
                 <h2 id="boot" data-reveal>Boot Sequence</h2>
@@ -479,10 +487,11 @@ pip install -r backend/requirements.txt
 cd app && npm install && npm run electron:dev</code></pre>
 
                 <h2 id="knowledge" data-reveal>Retrieval RAG</h2>
-                <p>Local knowledge injection is handled via the <strong>Context Module</strong>. Artifacts (PDF/TXT) are
-                    parsed and tokenized into 400-word segments.</p>
-                <p>Similarity is ranked via <strong>Cosine Weighting</strong> against the query vector, enabling the
-                    model to retrieve specific excerpts without external indexing services.</p>
+                <p>Local knowledge injection is handled via the <strong>Context Module</strong>. Uploaded PDF/TXT
+                    artifacts are parsed and split into overlapping 500-word chunks (50-word overlap).</p>
+                <p>Chunks are indexed with a <strong>TF-IDF vectorizer</strong> (scikit-learn) and ranked by
+                    <strong>cosine similarity</strong> against the query vector, surfacing the top-5 most relevant
+                    excerpts without any external indexing service or embedding API call.</p>
 
                 <div class="sys-alert" data-reveal>
                     <h3 style="margin-top: 0;">SECURITY_NOTICE</h3>
@@ -491,9 +500,12 @@ cd app && npm install && npm run electron:dev</code></pre>
                 </div>
 
                 <h2 id="agency" data-reveal>Agent Sensory</h2>
-                <p>The system possesses <strong>Autonomous Discovery</strong> capabilities. When the neural core
-                    identifies an information void, it initiates a <code>[SEARCH:]</code> protocol to scan global
-                    networks.</p>
+                <p>The system possesses <strong>Autonomous Discovery</strong> capabilities. The model itself decides
+                    when it needs external information and emits a <code>[SEARCH: query]</code> directive mid-response,
+                    which the core intercepts, resolves via DuckDuckGo, and feeds back into context — no hardcoded
+                    trigger, no forced tool call.</p>
+                <p>Enabling <strong>Deep Search</strong> expands a single directive into a multi-source research pass
+                    instead of one lookup, for questions that need cross-referencing.</p>
 
                 <h2 id="api" data-reveal>Command API</h2>
                 <p>Technical interfaces for direct node control:</p>
@@ -505,7 +517,19 @@ cd app && npm install && npm run electron:dev</code></pre>
                 <h3>Discovery Flow</h3>
                 <p><span class="mono"
                         style="color: var(--accent);">POST</span><code>/v1/chat/completions</code><br>Initiates a neural
-                    reasoning stream with agentic flags enabled.</p>
+                    reasoning stream, with optional <code>deep_search</code> flag.</p>
+
+                <h3>Model Foundry</h3>
+                <p><span class="mono" style="color: var(--accent);">GET</span><code>/v1/models/search</code><br>Queries
+                    Hugging Face for available GGUF archives.</p>
+                <p><span class="mono" style="color: var(--accent);">POST</span><code>/v1/models/download</code><br>Pulls
+                    a selected archive directly into local storage — no browser, no manual file placement.</p>
+                <p><span class="mono" style="color: var(--accent);">GET</span><code>/v1/models/local</code><br>Lists
+                    archives already mounted on this node.</p>
+
+                <h3>Document Ingest</h3>
+                <p><span class="mono" style="color: var(--accent);">POST</span><code>/v1/documents/upload</code><br>
+                    Submits a PDF/TXT artifact for chunking and indexing into the Context Module.</p>
             </main>
         </div>
     </div>
