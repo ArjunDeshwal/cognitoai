@@ -1,12 +1,17 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, session, shell } = require('electron');
 const path = require('path');
 const { spawn } = require('child_process');
 const fs = require('fs');
+const net = require('net');
+const crypto = require('crypto');
+const { pathToFileURL } = require('url');
 
 let mainWindow;
 let pythonProcess = null;
+let backendConfig = null;
 
 const isDev = !app.isPackaged;
+const productionRendererRoot = pathToFileURL(path.join(__dirname, '../dist') + path.sep).href;
 
 // === DEBUG LOGGING FOR PACKAGED BUILDS ===
 const logFile = isDev ? null : path.join(app.getPath('userData'), 'cognito-debug.log');
@@ -52,7 +57,27 @@ function getScriptPath() {
   return null; // Not needed for bundled exe
 }
 
-function startPythonServer() {
+function findAvailablePort() {
+  return new Promise((resolve, reject) => {
+    const server = net.createServer();
+    server.unref();
+    server.on('error', reject);
+    server.listen(0, '127.0.0.1', () => {
+      const address = server.address();
+      server.close(() => resolve(address.port));
+    });
+  });
+}
+
+function isTrustedRenderer(event) {
+  const senderUrl = event.senderFrame?.url || '';
+  if (isDev) {
+    return senderUrl.startsWith('http://localhost:5173/');
+  }
+  return senderUrl.startsWith(productionRendererRoot);
+}
+
+function startPythonServer(port, token) {
   const pythonPath = getPythonPath();
   const scriptPath = getScriptPath();
 
@@ -67,9 +92,13 @@ function startPythonServer() {
     const cwd = path.join(__dirname, '../../backend');
     log('CWD: ' + cwd);
 
-    pythonProcess = spawn(pythonPath, ['-m', 'uvicorn', 'server:app', '--host', '127.0.0.1', '--port', '8000'], {
+    pythonProcess = spawn(pythonPath, ['-m', 'uvicorn', 'server:app', '--host', '127.0.0.1', '--port', String(port)], {
       cwd: cwd,
-      env: process.env, // Pass env vars
+      env: {
+        ...process.env,
+        COGNITO_API_TOKEN: token,
+        COGNITO_ALLOWED_ORIGINS: 'http://localhost:5173,http://127.0.0.1:5173,null'
+      },
       stdio: 'pipe' // Capture output
     });
   } else {
@@ -77,7 +106,12 @@ function startPythonServer() {
     log('Spawning production binary...');
     try {
       pythonProcess = spawn(pythonPath, [], {
-        env: { ...process.env, PORT: '8000' },
+        env: {
+          ...process.env,
+          PORT: String(port),
+          COGNITO_API_TOKEN: token,
+          COGNITO_ALLOWED_ORIGINS: 'null'
+        },
         stdio: 'pipe'
       });
       log('Spawn successful, PID: ' + pythonProcess.pid);
@@ -108,9 +142,14 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
+    minWidth: 900,
+    minHeight: 620,
+    show: false,
+    backgroundColor: '#0a0d14',
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
+      sandbox: true,
       preload: path.join(__dirname, 'preload.cjs')
     },
     titleBarStyle: 'hiddenInset', // Mac style
@@ -135,12 +174,42 @@ function createWindow() {
   mainWindow.webContents.on('did-finish-load', () => {
     log('Page finished loading successfully');
   });
+
+  mainWindow.once('ready-to-show', () => mainWindow.show());
+
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith('https://')) {
+      void shell.openExternal(url);
+    }
+    return { action: 'deny' };
+  });
+
+  mainWindow.webContents.on('will-navigate', (event, url) => {
+    const allowedUrl = isDev ? 'http://localhost:5173/' : productionRendererRoot;
+    if (!url.startsWith(allowedUrl)) {
+      event.preventDefault();
+      if (url.startsWith('https://')) {
+        void shell.openExternal(url);
+      }
+    }
+  });
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   log('App is ready, starting initialization...');
+  const port = await findAvailablePort();
+  const token = crypto.randomBytes(32).toString('base64url');
+  backendConfig = { baseUrl: `http://127.0.0.1:${port}`, token };
+
+  session.defaultSession.setPermissionRequestHandler((_webContents, _permission, callback) => {
+    callback(false);
+  });
+
   // Register IPC handlers once, before creating windows
   ipcMain.handle('dialog:openFile', async (event) => {
+    if (!isTrustedRenderer(event)) {
+      throw new Error('Untrusted IPC sender');
+    }
     const window = BrowserWindow.fromWebContents(event.sender);
     const { canceled, filePaths } = await dialog.showOpenDialog(window, {
       properties: ['openFile'],
@@ -153,7 +222,14 @@ app.whenReady().then(() => {
     }
   });
 
-  startPythonServer();
+  ipcMain.handle('backend:getConfig', async (event) => {
+    if (!isTrustedRenderer(event)) {
+      throw new Error('Untrusted IPC sender');
+    }
+    return backendConfig;
+  });
+
+  startPythonServer(port, token);
   createWindow();
 
   app.on('activate', function () {

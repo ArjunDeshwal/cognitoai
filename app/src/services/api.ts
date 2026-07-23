@@ -1,4 +1,23 @@
-const API_URL = "http://127.0.0.1:8000";
+export type ApiConfig = { baseUrl: string; token: string };
+
+let apiConfig: ApiConfig | null = null;
+
+function errorMessage(error: unknown): string {
+    return error instanceof Error ? error.message : String(error);
+}
+
+export function configureApi(config: ApiConfig) {
+    apiConfig = config;
+}
+
+function apiFetch(path: string, init: RequestInit = {}) {
+    if (!apiConfig) {
+        throw new Error("Cognito's local service is not configured");
+    }
+    const headers = new Headers(init.headers);
+    headers.set('Authorization', `Bearer ${apiConfig.token}`);
+    return fetch(`${apiConfig.baseUrl}${path}`, { ...init, headers });
+}
 
 export type HealthStatus = {
     status: 'ok' | 'error';
@@ -18,18 +37,18 @@ export type StreamEvent = {
 
 export async function checkBackendHealth(): Promise<HealthStatus | null> {
     try {
-        const res = await fetch(`${API_URL}/health`);
+        const res = await apiFetch('/health');
         if (res.ok) {
             return await res.json();
         }
         return null;
-    } catch (e) {
+    } catch {
         return null;
     }
 }
 
 export async function loadModel(modelPath: string, contextWindow: number = 8192) {
-    const res = await fetch(`${API_URL}/v1/load_model`, {
+    const res = await apiFetch('/v1/load_model', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ path: modelPath, n_ctx: contextWindow }),
@@ -49,15 +68,16 @@ export async function chatCompletionStream(
     onChunk: (content: string) => void,
     onDone: () => void,
     onError: (error: string) => void,
+    webSearch: boolean = false,
     deepSearch: boolean = false,
     useDocuments: boolean = false,
     signal?: AbortSignal
 ): Promise<void> {
     try {
-        const res = await fetch(`${API_URL}/v1/chat/completions`, {
+        const res = await apiFetch('/v1/chat/completions', {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ messages, stream: true, deep_search: deepSearch, use_documents: useDocuments }),
+            body: JSON.stringify({ messages, stream: true, web_search: webSearch, deep_search: deepSearch, use_documents: useDocuments }),
             signal
         });
 
@@ -111,18 +131,18 @@ export async function chatCompletionStream(
                             onError(parsed.error);
                             return;
                         }
-                    } catch (e) {
+                    } catch {
                         // Ignore parse errors
                     }
                 }
             }
         }
-    } catch (e: any) {
-        if (e.name === 'AbortError') {
+    } catch (error: unknown) {
+        if (error instanceof DOMException && error.name === 'AbortError') {
             onDone(); // Silence error on abort
             return;
         }
-        onError(e.toString());
+        onError(errorMessage(error));
     }
 }
 
@@ -167,7 +187,7 @@ export type DownloadEvent = {
 
 export async function searchModels(query: string): Promise<HFModel[]> {
     try {
-        const res = await fetch(`${API_URL}/v1/models/search?q=${encodeURIComponent(query)}`);
+        const res = await apiFetch(`/v1/models/search?q=${encodeURIComponent(query)}`);
         if (!res.ok) throw new Error(await res.text());
         const data = await res.json();
         return data.models || [];
@@ -179,7 +199,7 @@ export async function searchModels(query: string): Promise<HFModel[]> {
 
 export async function getModelFiles(repoId: string): Promise<ModelFile[]> {
     try {
-        const res = await fetch(`${API_URL}/v1/models/files/${encodeURIComponent(repoId)}`);
+        const res = await apiFetch(`/v1/models/files/${encodeURIComponent(repoId)}`);
         if (!res.ok) throw new Error(await res.text());
         const data = await res.json();
         return data.files || [];
@@ -195,7 +215,7 @@ export async function downloadModel(
     onProgress: (event: DownloadEvent) => void
 ): Promise<void> {
     try {
-        const res = await fetch(`${API_URL}/v1/models/download`, {
+        const res = await apiFetch('/v1/models/download', {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ repo_id: repoId, filename }),
@@ -225,33 +245,33 @@ export async function downloadModel(
                     try {
                         const event: DownloadEvent = JSON.parse(line.slice(6));
                         onProgress(event);
-                    } catch (e) { /* ignore */ }
+                    } catch { /* ignore malformed progress events */ }
                 }
             }
         }
-    } catch (e: any) {
-        onProgress({ status: 'error', error: e.toString() });
+    } catch (error: unknown) {
+        onProgress({ status: 'error', error: errorMessage(error) });
     }
 }
 
 export async function listLocalModels(): Promise<{ models: LocalModel[]; directory: string }> {
     try {
-        const res = await fetch(`${API_URL}/v1/models/local`);
+        const res = await apiFetch('/v1/models/local');
         if (!res.ok) throw new Error(await res.text());
         return await res.json();
-    } catch (e) {
-        console.error("List models failed:", e);
+    } catch (error: unknown) {
+        console.error("List models failed:", error);
         return { models: [], directory: "" };
     }
 }
 
 export async function deleteLocalModel(filename: string): Promise<boolean> {
     try {
-        const res = await fetch(`${API_URL}/v1/models/local/${encodeURIComponent(filename)}`, {
+        const res = await apiFetch(`/v1/models/local/${encodeURIComponent(filename)}`, {
             method: "DELETE"
         });
         return res.ok;
-    } catch (e) {
+    } catch {
         return false;
     }
 }
@@ -277,7 +297,7 @@ export async function uploadDocument(file: File): Promise<DocumentUploadResponse
         const formData = new FormData();
         formData.append('file', file);
 
-        const res = await fetch(`${API_URL}/v1/documents/upload`, {
+        const res = await apiFetch('/v1/documents/upload', {
             method: "POST",
             body: formData
         });
@@ -288,43 +308,42 @@ export async function uploadDocument(file: File): Promise<DocumentUploadResponse
         }
 
         return await res.json();
-    } catch (e) {
-        console.error("Document upload failed:", e);
-        throw e;
+    } catch (error: unknown) {
+        console.error("Document upload failed:", error);
+        throw error;
     }
 }
 
 export async function listDocuments(): Promise<UploadedDocument[]> {
     try {
-        const res = await fetch(`${API_URL}/v1/documents`);
+        const res = await apiFetch('/v1/documents');
         if (!res.ok) throw new Error(await res.text());
         const data = await res.json();
         return data.documents || [];
-    } catch (e) {
-        console.error("List documents failed:", e);
+    } catch (error: unknown) {
+        console.error("List documents failed:", error);
         return [];
     }
 }
 
 export async function deleteDocument(docId: string): Promise<boolean> {
     try {
-        const res = await fetch(`${API_URL}/v1/documents/${encodeURIComponent(docId)}`, {
+        const res = await apiFetch(`/v1/documents/${encodeURIComponent(docId)}`, {
             method: "DELETE"
         });
         return res.ok;
-    } catch (e) {
+    } catch {
         return false;
     }
 }
 
 export async function clearAllDocuments(): Promise<boolean> {
     try {
-        const res = await fetch(`${API_URL}/v1/documents`, {
+        const res = await apiFetch('/v1/documents', {
             method: "DELETE"
         });
         return res.ok;
-    } catch (e) {
+    } catch {
         return false;
     }
 }
-

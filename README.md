@@ -1,8 +1,8 @@
 # COGNITO
 
-**Private. Local. Fast.**
+**Local intelligence, under your control.**
 
-A fully local AI assistant that runs on your machine. No cloud, no data collection, no subscriptions. Your conversations stay yours.
+A privacy-first desktop AI workspace powered by local GGUF models. Inference and document processing stay on your device; optional model downloads and web research are explicit, visible network actions.
 
 ![Cognito Screenshot](./docs/screenshot.png)
 
@@ -10,20 +10,21 @@ A fully local AI assistant that runs on your machine. No cloud, no data collecti
 
 ## ✨ Features
 
-### 🔒 100% Private
+### 🔒 Private by Default
 - All inference runs locally on your hardware
-- No data ever leaves your machine
+- Web access starts disabled for every app launch
+- Choose Local, Web, or Deep research mode per conversation
 - No API keys or cloud accounts required
 
 ### 🚀 Fast & Lightweight
 - Powered by llama.cpp for efficient inference
 - Supports GGUF quantized models
-- Works on Apple Silicon, NVIDIA GPUs, or CPU
+- Supports CPU and platform-specific llama.cpp acceleration builds
 
-### 🔍 Intelligent Search
-- Built-in web search (model decides when to search)
+### 🔍 Permissioned Research
+- Built-in web search only when Web or Deep mode is enabled
 - Deep search mode for comprehensive research
-- Automatic context injection
+- Source URLs remain visible in generated answers
 
 ### 📄 Document RAG
 - Upload PDFs and text files
@@ -46,7 +47,7 @@ A fully local AI assistant that runs on your machine. No cloud, no data collecti
 
 ### Prerequisites
 
-#### 1. Node.js (v18+)
+#### 1. Node.js (v22.12+)
 - **Check if installed:**
   ```bash
   node --version
@@ -66,7 +67,7 @@ A fully local AI assistant that runs on your machine. No cloud, no data collecti
 
 #### 3. GPU Acceleration (Optional but Recommended)
 - **macOS:** Apple Silicon (M1/M2/M3) works out of the box.
-- **Windows/Linux:** NVIDIA GPU with CUDA drivers installed.
+- **Windows/Linux:** GPU acceleration requires a CUDA-enabled `llama-cpp-python` build; the default Python package may run on CPU.
 
 ### Quick Start
 
@@ -95,7 +96,7 @@ A fully local AI assistant that runs on your machine. No cloud, no data collecti
 3. **Install frontend dependencies**
    ```bash
    cd app
-   npm install
+   npm ci
    ```
 
 4. **Run the app**
@@ -165,7 +166,7 @@ Open source on [GitHub](https://github.com/ArjunDeshwal/cognitoai) ·
 
 ### Code Style
 
-- **Frontend**: TypeScript, React hooks, CSS modules
+- **Frontend**: TypeScript, React hooks, component-scoped CSS
 - **Backend**: Python 3.10+, FastAPI, type hints
 - **Commits**: Use [Conventional Commits](https://www.conventionalcommits.org/)
 

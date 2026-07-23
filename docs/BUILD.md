@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- Node.js 18+
+- Node.js 22.12+
 - Python 3.10+
 
 ## Build Commands
@@ -30,7 +30,6 @@ Built files will be in `app/release/`:
 ```
 release/
 ├── Cognito-1.0.0-arm64.dmg      # Mac Apple Silicon
-├── Cognito-1.0.0.dmg             # Mac Intel
 ├── Cognito-Setup-1.0.0.exe       # Windows Installer
 ├── Cognito-1.0.0-portable.exe    # Windows Portable
 ├── Cognito-1.0.0.AppImage        # Linux
@@ -59,15 +58,13 @@ Use a tool like:
 ## Important Notes
 
 ### Python Backend
-The build includes the `backend/` folder but users still need:
-- Python 3.10+ installed
-- To run `pip install -r backend/requirements.txt`
+Release builds bundle the FastAPI backend as a standalone PyInstaller executable. End users do not need Python or pip. Developers still need Python 3.10+ when running from source.
 
-### Code Signing (Optional)
-For production releases without security warnings:
+### Code Signing
+Code signing and macOS notarization are required for a trustworthy production release:
 - Mac: Apple Developer certificate ($99/year)
 - Windows: Code signing certificate (~$100-300/year)
 
-Without signing, users will see:
+Unsigned development builds will show:
 - Mac: "Cannot be opened because developer cannot be verified"
 - Windows: "Windows protected your PC" warning

@@ -2,7 +2,7 @@
   "name": "cognito",
   "productName": "Cognito",
   "version": "1.0.0",
-  "description": "Private. Local. Fast. - Your local AI assistant",
+  "description": "Local intelligence, under your control.",
   "author": "Arjun Deshwal <support@cognito.ai>",
   "repository": {
     "type": "git",
@@ -10,6 +10,9 @@
   },
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "main": "electron/main.cjs",
   "scripts": {
     "dev": "vite",
@@ -20,6 +23,7 @@
     "package:win": "npm run build && electron-builder --win",
     "package:linux": "npm run build && electron-builder --linux",
     "lint": "eslint .",
+    "typecheck": "tsc -b --pretty false",
     "preview": "vite preview"
   },
   "build": {

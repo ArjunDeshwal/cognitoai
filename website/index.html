@@ -6,16 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cognito — A Fully Local AI Assistant, No Cloud Required</title>
     <meta name="description"
-        content="Cognito is an open-source, fully local AI assistant powered by llama.cpp and GGUF models. Chat, search the web, and query your own documents — no telemetry, no subscriptions, no data leaving your machine.">
+        content="Cognito is an open-source, privacy-first AI workspace powered by local llama.cpp and GGUF models. Local inference, on-device document chat, and explicitly enabled web research.">
     <meta property="og:type" content="website">
     <meta property="og:title" content="Cognito — A Fully Local AI Assistant, No Cloud Required">
     <meta property="og:description"
-        content="Open-source, fully local AI assistant. llama.cpp inference, one-click Hugging Face model downloads, agentic web search, and private document chat — zero cloud, zero telemetry.">
+        content="Open-source local AI workspace with llama.cpp inference, on-device document chat, and permissioned web research.">
     <meta property="og:image" content="screenshot.png">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Cognito — A Fully Local AI Assistant, No Cloud Required">
     <meta name="twitter:description"
-        content="Open-source, fully local AI assistant. llama.cpp inference, one-click Hugging Face model downloads, agentic web search, and private document chat.">
+        content="Open-source local AI workspace with on-device inference, private document chat, and explicitly enabled web research.">
     <meta name="twitter:image" content="screenshot.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -664,10 +664,10 @@
                     <div class="pulse"></div>
                     <span class="mono">Neural Core: Active</span>
                 </div>
-                <h1>Private.<br>Local.<br><span style="color: var(--accent);">Unrestricted.</span></h1>
-                <p>Cognito is a fully local AI assistant: chat, agentic web search, and private document Q&A, running
-                    on llama.cpp and GGUF models. No cloud calls, no subscriptions, no telemetry — open source under
-                    MIT.</p>
+                <h1>Private.<br>Local.<br><span style="color: var(--accent);">Controlled.</span></h1>
+                <p>Cognito is a privacy-first AI workspace for local chat and document Q&A, powered by llama.cpp and
+                    GGUF models. Network features are visible and permissioned, with no account or subscription — open
+                    source under MIT.</p>
                 <div class="btn-row">
                     <a href="https://github.com/ArjunDeshwal/cognitoai#installation" class="cta-btn">
                         Initialize Node
@@ -695,8 +695,8 @@
         <section data-reveal>
             <div class="stats-strip">
                 <div class="stat-cell">
-                    <span class="stat-value">0</span>
-                    <span class="stat-label">Bytes Transmitted</span>
+                    <span class="stat-value">OFF</span>
+                    <span class="stat-label">Network by Default</span>
                 </div>
                 <div class="stat-cell">
                     <span class="stat-value">100%</span>
@@ -704,7 +704,7 @@
                 </div>
                 <div class="stat-cell">
                     <span class="stat-value">GGUF</span>
-                    <span class="stat-label">Metal / CUDA Accel</span>
+                    <span class="stat-label">llama.cpp Runtime</span>
                 </div>
                 <div class="stat-cell">
                     <span class="stat-value">RAM</span>
@@ -770,8 +770,8 @@
                     <span class="mono"
                         style="color: var(--accent); margin-bottom: 8px; display: block;">Agent_Scan</span>
                     <h3>Agentic Search</h3>
-                    <p>The model decides when it needs the web, not a hardcoded rule. Flip on Deep Search for
-                        multi-source research passes.</p>
+                    <p>Every conversation starts local. Enable Web or Deep mode when you want cited, multi-source
+                        research beyond the device.</p>
                 </div>
                 <div class="module module-full" data-reveal>
                     <div class="module-index">MOD_05</div>

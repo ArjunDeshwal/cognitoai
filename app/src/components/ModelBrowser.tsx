@@ -6,9 +6,10 @@ import './ModelBrowser.css';
 type Props = {
     onClose: () => void;
     onModelLoaded: () => void;
+    contextWindow: number;
 };
 
-export default function ModelBrowser({ onClose, onModelLoaded }: Props) {
+export default function ModelBrowser({ onClose, onModelLoaded, contextWindow }: Props) {
     const [activeTab, setActiveTab] = useState<'search' | 'local'>('local');
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<HFModel[]>([]);
@@ -20,12 +21,21 @@ export default function ModelBrowser({ onClose, onModelLoaded }: Props) {
 
     const [downloadProgress, setDownloadProgress] = useState<DownloadEvent | null>(null);
     const [downloading, setDownloading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const [localModels, setLocalModels] = useState<LocalModel[]>([]);
     const [localDirectory, setLocalDirectory] = useState('');
 
     useEffect(() => {
-        loadLocalModels();
+        let active = true;
+        void listLocalModels().then((result) => {
+            if (!active) return;
+            setLocalModels(result.models);
+            setLocalDirectory(result.directory);
+        });
+        return () => {
+            active = false;
+        };
     }, []);
 
     const loadLocalModels = async () => {
@@ -53,6 +63,7 @@ export default function ModelBrowser({ onClose, onModelLoaded }: Props) {
 
     const handleDownload = async (file: ModelFile) => {
         if (!selectedModel) return;
+        setError(null);
         setDownloading(true);
         setDownloadProgress({ status: 'starting' });
 
@@ -63,28 +74,41 @@ export default function ModelBrowser({ onClose, onModelLoaded }: Props) {
                 loadLocalModels();
             } else if (event.status === 'error') {
                 setDownloading(false);
-                alert('Download failed: ' + event.error);
+                setError(`Download failed: ${event.error ?? 'Unknown error'}`);
             }
         });
     };
 
     const handleLoadModel = async (model: LocalModel) => {
         try {
-            await loadModel(model.path);
+            setError(null);
+            await loadModel(model.path, contextWindow);
             onModelLoaded();
             onClose();
-        } catch (e: any) {
-            alert('Failed to load model: ' + e.toString());
+        } catch (error: unknown) {
+            setError('Failed to load model: ' + (error instanceof Error ? error.message : String(error)));
         }
     };
 
     return (
-        <div className="model-browser-overlay">
-            <div className="model-browser">
+        <div className="model-browser-overlay" role="presentation" onMouseDown={(event) => {
+            if (event.target === event.currentTarget) onClose();
+        }}>
+            <div className="model-browser" role="dialog" aria-modal="true" aria-labelledby="model-manager-title">
                 <header className="browser-header">
-                    <h2>Model Manager</h2>
-                    <button className="close-btn" onClick={onClose}>×</button>
+                    <div>
+                        <span className="browser-eyebrow">LOCAL MODEL LIBRARY</span>
+                        <h2 id="model-manager-title">Model Manager</h2>
+                    </div>
+                    <button className="close-btn" onClick={onClose} aria-label="Close model manager">×</button>
                 </header>
+
+                {error && (
+                    <div className="browser-error" role="alert">
+                        <span>{error}</span>
+                        <button onClick={() => setError(null)} aria-label="Dismiss error">×</button>
+                    </div>
+                )}
 
                 <div className="browser-tabs">
                     <button

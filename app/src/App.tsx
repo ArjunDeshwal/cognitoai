@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import './App.css';
-import { checkBackendHealth, loadModel, chatCompletionStream, uploadDocument, deleteDocument, clearAllDocuments } from './services/api';
+import { checkBackendHealth, loadModel, chatCompletionStream, uploadDocument, deleteDocument, clearAllDocuments, listDocuments } from './services/api';
 import type { StreamStatus, UploadedDocument } from './services/api';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -18,13 +18,18 @@ type Session = {
   timestamp: number;
 };
 
-const generateId = () => Math.random().toString(36).substr(2, 9);
+type SearchMode = 'offline' | 'web' | 'deep';
 
-declare global {
-  interface Window {
-    electronAPI: {
-      selectFile: () => Promise<string | null>;
-    };
+const generateId = () => crypto.randomUUID();
+
+function loadSessions(): Session[] {
+  try {
+    const saved = localStorage.getItem('cognito_sessions');
+    const parsed: unknown = saved ? JSON.parse(saved) : [];
+    return Array.isArray(parsed) ? parsed as Session[] : [];
+  } catch {
+    localStorage.removeItem('cognito_sessions');
+    return [];
   }
 }
 
@@ -68,23 +73,20 @@ function MessageContent({ content }: { content: string }) {
 }
 
 function App() {
-  const [status, setStatus] = useState<'offline' | 'online' | 'loading'>('offline');
-  const [modelPath, setModelPath] = useState('');
+  const [status, setStatus] = useState<'offline' | 'online' | 'loading'>('loading');
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const [loadedModelName, setLoadedModelName] = useState<string | null>(null);
 
-  const [sessions, setSessions] = useState<Session[]>(() => {
-    const saved = localStorage.getItem('cognito_sessions');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [sessions, setSessions] = useState<Session[]>(loadSessions);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [deepSearchEnabled, setDeepSearchEnabled] = useState(false);
+  const [searchMode, setSearchMode] = useState<SearchMode>('offline');
   const [showModelBrowser, setShowModelBrowser] = useState(false);
+  const [notice, setNotice] = useState<{ type: 'error' | 'success'; message: string } | null>(null);
 
   // New: stream status for search/generating indication
   const [streamStatus, setStreamStatus] = useState<StreamStatus | null>(null);
@@ -110,31 +112,48 @@ function App() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const startupAttemptsRef = useRef(0);
 
   useEffect(() => {
-    const interval = setInterval(async () => {
+    let active = true;
+    const refreshHealth = async () => {
       const health = await checkBackendHealth();
+      if (!active) return;
       if (health && health.status === 'ok') {
+        startupAttemptsRef.current = 0;
         setStatus('online');
-        if (health.model_name) {
-          setLoadedModelName(health.model_name);
-        }
-        if (!health.model_loaded && isModelLoaded) {
-          setIsModelLoaded(false);
-          setLoadedModelName(null);
-        }
-        if (health.model_loaded && !isModelLoaded) {
-          setIsModelLoaded(true);
-        }
+        setIsModelLoaded(health.model_loaded);
+        setLoadedModelName(health.model_loaded ? health.model_name ?? null : null);
       } else {
-        setStatus('offline');
+        startupAttemptsRef.current += 1;
+        setStatus(startupAttemptsRef.current < 8 ? 'loading' : 'offline');
+        setIsModelLoaded(false);
+        setLoadedModelName(null);
       }
-    }, 2000);
-    return () => clearInterval(interval);
-  }, [isModelLoaded]);
+    };
+    void refreshHealth();
+    const interval = setInterval(refreshHealth, 2000);
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
+  }, []);
 
   useEffect(() => {
-    localStorage.setItem('cognito_sessions', JSON.stringify(sessions));
+    if (status === 'online') {
+      void listDocuments().then(setUploadedDocuments);
+    }
+  }, [status]);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      try {
+        localStorage.setItem('cognito_sessions', JSON.stringify(sessions));
+      } catch {
+        setNotice({ type: 'error', message: 'Chat history is full. Export or remove older chats.' });
+      }
+    }, 400);
+    return () => window.clearTimeout(timeout);
   }, [sessions]);
 
   const scrollToBottom = () => {
@@ -164,10 +183,10 @@ function App() {
       messages: [],
       timestamp: Date.now()
     };
-    setSessions([newSession, ...sessions]);
+    setSessions(previous => [newSession, ...previous]);
     setCurrentSessionId(newId);
     setMessages([]);
-    setIsModelLoaded(true);
+    return newId;
   };
 
   const handleSelectSession = (id: string) => {
@@ -175,7 +194,6 @@ function App() {
     if (session) {
       setCurrentSessionId(id);
       setMessages(session.messages);
-      setIsModelLoaded(true);
     }
   };
 
@@ -196,30 +214,14 @@ function App() {
     }
   };
 
-  const handleLoadModel = async () => {
-    try {
-      setLoading(true);
-      await loadModel(modelPath, contextWindow);
-      setIsModelLoaded(true);
-      if (!currentSessionId) {
-        handleNewChat();
-      }
-    } catch (e) {
-      alert('Failed to load model: ' + e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleChangeModel = async () => {
     if (!window.electronAPI) {
-      alert("Electron API not available");
+      setNotice({ type: 'error', message: 'File selection is only available in the desktop app.' });
       return;
     }
     try {
       const path = await window.electronAPI.selectFile();
       if (path) {
-        setModelPath(path);
         setLoading(true);
         await loadModel(path, contextWindow);
         setIsModelLoaded(true);
@@ -228,7 +230,7 @@ function App() {
         }
       }
     } catch (e) {
-      alert('Failed to change model: ' + e);
+      setNotice({ type: 'error', message: `Failed to change model: ${String(e)}` });
     } finally {
       setLoading(false);
     }
@@ -250,8 +252,9 @@ function App() {
       if (result?.document) {
         setUploadedDocuments(prev => [...prev, result.document]);
       }
-    } catch (e: any) {
-      alert('Failed to upload document: ' + (e.message || e.toString()));
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e);
+      setNotice({ type: 'error', message: `Failed to upload document: ${message}` });
     } finally {
       setIsUploading(false);
     }
@@ -296,10 +299,12 @@ function App() {
 
   const handleSend = async () => {
     if (!input.trim()) return;
-
-    if (!currentSessionId) {
-      handleNewChat();
+    if (!isModelLoaded) {
+      setNotice({ type: 'error', message: 'Load a model before sending a message.' });
+      return;
     }
+
+    if (!currentSessionId) handleNewChat();
 
     const newUserMsg: Message = { role: 'user', content: input };
 
@@ -358,20 +363,21 @@ function App() {
         (error) => {
           if (error.includes("No model loaded")) {
             setIsModelLoaded(false);
-            alert("Session expired. Please reload the model.");
+            setNotice({ type: 'error', message: 'The model is no longer loaded. Select a model to continue.' });
           } else {
-            alert('Error generating reply: ' + error);
+            setNotice({ type: 'error', message: `Generation failed: ${error}` });
           }
           setLoading(false);
           setStreamStatus(null);
           abortControllerRef.current = null;
         },
-        deepSearchEnabled,  // Pass deep search flag
+        searchMode !== 'offline',
+        searchMode === 'deep',
         useDocuments,  // Pass document RAG flag
         controller.signal
       );
-    } catch (e: any) {
-      alert('Error: ' + e.toString());
+    } catch (e: unknown) {
+      setNotice({ type: 'error', message: `Generation failed: ${String(e)}` });
       setLoading(false);
       setStreamStatus(null);
     }
@@ -423,21 +429,31 @@ function App() {
     );
   };
 
-  // Show loading screen while engine is starting
-  if (status === 'offline') {
+  // Keep startup failures distinct from ordinary model state.
+  if (status !== 'online') {
     return (
       <div className="app-container">
         <div className="startup-screen">
           <div className="startup-logo">
             <h1>COGNITO</h1>
-            <div className="startup-subtitle">Private. Local. Fast.</div>
+            <div className="startup-subtitle">Local intelligence, under your control.</div>
           </div>
-          <div className="startup-loader">
-            <div className="loader-ring"></div>
-            <div className="loader-ring"></div>
-            <div className="loader-ring"></div>
-          </div>
-          <div className="startup-status">Starting Engine...</div>
+          {status === 'loading' ? (
+            <>
+              <div className="startup-loader" aria-label="Starting local engine">
+                <div className="loader-ring"></div>
+                <div className="loader-ring"></div>
+                <div className="loader-ring"></div>
+              </div>
+              <div className="startup-status">Starting the private local engine…</div>
+            </>
+          ) : (
+            <div className="startup-failure" role="alert">
+              <strong>Local engine unavailable</strong>
+              <span>Cognito is retrying automatically. Check the application log if this continues.</span>
+              <button onClick={() => window.location.reload()}>Restart Cognito</button>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -446,12 +462,19 @@ function App() {
   return (
     <div className="app-container">
       <header className="header">
-        <h1 className="logo">COGNITO</h1>
+        <div className="brand-lockup">
+          <div className="brand-mark">C</div>
+          <div>
+            <h1 className="logo">COGNITO</h1>
+            <span className="brand-caption">LOCAL WORKSPACE</span>
+          </div>
+        </div>
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
           {status === 'online' && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div className="status-badge" style={{ color: '#94a3b8', borderColor: 'rgba(255,255,255,0.1)' }}>
-                {loadedModelName ? `Running: ${loadedModelName}` : 'No Model Loaded'}
+              <div className={`status-badge ${loadedModelName ? 'online' : ''}`}>
+                <span className="status-dot" />
+                {loadedModelName ? loadedModelName : 'Engine ready'}
               </div>
               <button
                 onClick={handleChangeModel}
@@ -547,6 +570,13 @@ function App() {
         </div>
       </header>
 
+      {notice && (
+        <div className={`notice-banner ${notice.type}`} role="status">
+          <span>{notice.message}</span>
+          <button onClick={() => setNotice(null)} aria-label="Dismiss notification">×</button>
+        </div>
+      )}
+
       <div className="layout-body">
         <div className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
           <button
@@ -584,29 +614,38 @@ function App() {
         </div>
 
         <main className="main-content">
-          {!isModelLoaded && sessions.length === 0 ? (
-            <div className="setup-card">
-              <h2>Load Your Model</h2>
-              <p>Enter the absolute path to a .gguf file to begin.</p>
-              <div className="input-group">
-                <input
-                  type="text"
-                  placeholder="/Users/name/models/mistral.gguf"
-                  value={modelPath}
-                  onChange={(e) => setModelPath(e.target.value)}
-                />
-                <button onClick={handleLoadModel} disabled={status !== 'online' || loading}>
-                  {loading ? 'Loading...' : 'Load Model'}
+          {!isModelLoaded ? (
+            <div className="setup-card setup-modern">
+              <div className="setup-eyebrow">PRIVATE BY DEFAULT</div>
+              <h2>Bring your own intelligence.</h2>
+              <p className="setup-lead">Run a GGUF model entirely on this device. Start from your library or choose a model from Hugging Face.</p>
+              <div className="setup-actions">
+                <button className="setup-primary" onClick={() => setShowModelBrowser(true)} disabled={loading}>
+                  Open model library
                 </button>
+                <button className="setup-secondary" onClick={handleChangeModel} disabled={loading}>
+                  Choose a GGUF file
+                </button>
+              </div>
+              <div className="privacy-strip">
+                <span><strong>Local inference</strong>No prompt telemetry</span>
+                <span><strong>Network gated</strong>Search starts off</span>
+                <span><strong>Your files</strong>Processed on device</span>
               </div>
             </div>
           ) : (
             <div className="chat-interface">
               <div className="chat-history">
                 {messages.length === 0 && (
-                  <div style={{ textAlign: 'center', marginTop: '20%', opacity: 0.5 }}>
-                    <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '1.5rem', fontWeight: 600 }}>COGNITO</h3>
-                    <p>Ready to assist.</p>
+                  <div className="empty-chat">
+                    <div className="empty-chat-mark">C</div>
+                    <h3>What are we working on?</h3>
+                    <p>{searchMode === 'offline' ? 'Everything stays local unless you enable web research.' : 'Web research is enabled for this conversation.'}</p>
+                    <div className="starter-prompts">
+                      {['Summarize an attached document', 'Help me reason through a decision', 'Draft and refine an idea'].map(prompt => (
+                        <button key={prompt} onClick={() => setInput(prompt)}>{prompt}</button>
+                      ))}
+                    </div>
                   </div>
                 )}
                 {messages.map((m, i) => {
@@ -688,15 +727,16 @@ function App() {
                   </button>
 
                   <button
-                    className={`deep-search-btn ${deepSearchEnabled ? 'active' : ''}`}
-                    onClick={() => setDeepSearchEnabled(!deepSearchEnabled)}
-                    title={deepSearchEnabled ? 'Deep Search ON' : 'Deep Search OFF'}
+                    className={`deep-search-btn search-${searchMode}`}
+                    onClick={() => setSearchMode(current => current === 'offline' ? 'web' : current === 'web' ? 'deep' : 'offline')}
+                    title={`Research mode: ${searchMode}. Click to change.`}
                   >
-                    🔍
+                    <span className="search-mode-icon">⌕</span>
+                    <span className="search-mode-label">{searchMode === 'offline' ? 'Local' : searchMode === 'web' ? 'Web' : 'Deep'}</span>
                   </button>
                   <input
                     type="text"
-                    placeholder={uploadedDocuments.length > 0 ? "Ask about your document..." : (deepSearchEnabled ? "Deep search enabled..." : "Type a message...")}
+                    placeholder={uploadedDocuments.length > 0 ? "Ask about your documents…" : (searchMode === 'deep' ? "Research a topic deeply…" : "Message your local model…")}
                     value={input}
                     onKeyDown={(e) => e.key === 'Enter' && !loading && handleSend()}
                     onChange={(e) => setInput(e.target.value)}
@@ -733,6 +773,7 @@ function App() {
             setIsModelLoaded(true);
             if (!currentSessionId) handleNewChat();
           }}
+          contextWindow={contextWindow}
         />
       )}
 

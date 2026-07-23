@@ -37,7 +37,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: '22.12.0'
+          cache: npm
+          cache-dependency-path: app/package-lock.json
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -47,7 +49,13 @@ jobs:
       - name: Install Frontend Dependencies
         run: |
           cd app
-          npm install
+          npm ci
+
+      - name: Verify Frontend
+        run: |
+          cd app
+          npm run lint
+          npm run typecheck
 
       - name: Build Python Backend
         shell: bash

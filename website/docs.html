@@ -6,11 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Documentation — Cognito Local AI Assistant</title>
     <meta name="description"
-        content="Technical documentation for Cognito: architecture, installation, the TF-IDF retrieval RAG pipeline, agentic web search, and the local API surface.">
+        content="Technical documentation for Cognito: architecture, installation, the TF-IDF retrieval pipeline, permissioned web research, and the authenticated local API.">
     <meta property="og:type" content="website">
     <meta property="og:title" content="Documentation — Cognito Local AI Assistant">
     <meta property="og:description"
-        content="Architecture, installation, retrieval RAG, agentic search, and API reference for Cognito, a fully local AI assistant.">
+        content="Architecture, installation, retrieval RAG, permissioned search, and internal API reference for Cognito's local AI workspace.">
     <meta property="og:image" content="screenshot.png">
     <meta name="twitter:card" content="summary_large_image">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -470,7 +470,7 @@
 
                 <h3>Prerequisites</h3>
                 <ul>
-                    <li><strong>Node.js v18.0.0+</strong> (Interface Runtime)</li>
+                    <li><strong>Node.js v22.12.0+</strong> (Interface Runtime)</li>
                     <li><strong>Python v3.10.0+</strong> (Processing Kernel)</li>
                     <li><strong>C++ Compiler</strong> (Hardware Layer Mapping: Metal/CUDA)</li>
                 </ul>
@@ -484,7 +484,7 @@ source venv/bin/activate
 pip install -r backend/requirements.txt
 
 # EXECUTE_INIT
-cd app && npm install && npm run electron:dev</code></pre>
+cd app && npm ci && npm run electron:dev</code></pre>
 
                 <h2 id="knowledge" data-reveal>Retrieval RAG</h2>
                 <p>Local knowledge injection is handled via the <strong>Context Module</strong>. Uploaded PDF/TXT
@@ -500,15 +500,17 @@ cd app && npm install && npm run electron:dev</code></pre>
                 </div>
 
                 <h2 id="agency" data-reveal>Agent Sensory</h2>
-                <p>The system possesses <strong>Autonomous Discovery</strong> capabilities. The model itself decides
-                    when it needs external information and emits a <code>[SEARCH: query]</code> directive mid-response,
-                    which the core intercepts, resolves via DuckDuckGo, and feeds back into context — no hardcoded
-                    trigger, no forced tool call.</p>
+                <p>Network access is explicit. Each conversation starts in <strong>Local</strong> mode; choosing
+                    <strong>Web</strong> or <strong>Deep</strong> permits the model to emit a <code>[SEARCH: query]</code>
+                    directive that the core resolves through DuckDuckGo. Search results are treated as untrusted
+                    reference data and private-network destinations are blocked.</p>
                 <p>Enabling <strong>Deep Search</strong> expands a single directive into a multi-source research pass
                     instead of one lookup, for questions that need cross-referencing.</p>
 
                 <h2 id="api" data-reveal>Command API</h2>
-                <p>Technical interfaces for direct node control:</p>
+                <p>The desktop shell connects to the local API through a random per-launch port and bearer token.
+                    Requests without that token are rejected; the interface below is internal until a stable public API
+                    is released.</p>
 
                 <h3>Neural Mounting</h3>
                 <p><span class="mono" style="color: var(--accent);">POST</span><code>/v1/load_model</code><br>Mounts a
@@ -517,7 +519,7 @@ cd app && npm install && npm run electron:dev</code></pre>
                 <h3>Discovery Flow</h3>
                 <p><span class="mono"
                         style="color: var(--accent);">POST</span><code>/v1/chat/completions</code><br>Initiates a neural
-                    reasoning stream, with optional <code>deep_search</code> flag.</p>
+                    reasoning stream, with explicit <code>web_search</code> and optional <code>deep_search</code> flags.</p>
 
                 <h3>Model Foundry</h3>
                 <p><span class="mono" style="color: var(--accent);">GET</span><code>/v1/models/search</code><br>Queries

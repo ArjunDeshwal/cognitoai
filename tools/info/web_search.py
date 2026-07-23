@@ -7,7 +7,9 @@ import asyncio
 import aiohttp
 from bs4 import BeautifulSoup
 import random
-from urllib.parse import quote_plus
+import ipaddress
+import socket
+from urllib.parse import quote_plus, urljoin, urlparse
 
 # Optional import for pydantic_ai compatibility
 try:
@@ -97,27 +99,65 @@ async def duckduckgo_search(query: str, num_results: int = 8) -> list:
     return results
 
 
+async def is_public_web_url(url: str) -> bool:
+    """Reject local, private, link-local, and non-HTTP search destinations."""
+    parsed = urlparse(url)
+    if parsed.scheme not in {"http", "https"} or not parsed.hostname or parsed.username or parsed.password:
+        return False
+
+    try:
+        addresses = await asyncio.to_thread(
+            socket.getaddrinfo,
+            parsed.hostname,
+            parsed.port or (443 if parsed.scheme == "https" else 80),
+            type=socket.SOCK_STREAM,
+        )
+        return bool(addresses) and all(ipaddress.ip_address(item[4][0]).is_global for item in addresses)
+    except (OSError, ValueError):
+        return False
+
+
 async def fetch_page_content(session: aiohttp.ClientSession, url: str) -> str:
     """Fetches and cleans HTML content from a URL."""
     try:
         # Small delay to be polite
         await asyncio.sleep(random.uniform(0.5, 1.5))
         
-        async with session.get(url, headers=get_headers(), timeout=10, allow_redirects=True) as response:
-            if response.status != 200:
+        current_url = url
+        for _ in range(4):
+            if not await is_public_web_url(current_url):
+                print(f"[Fetch] Blocked non-public URL: {current_url}")
                 return ""
-            
-            html_content = await response.text()
-            soup = BeautifulSoup(html_content, 'html.parser')
-            
-            # Remove non-content elements
-            for element in soup(["header", "footer", "nav", "aside", "form", "script", "style", "noscript", "iframe"]):
-                element.decompose()
-            
-            content = soup.get_text(separator=' ')
-            content = re.sub(r'\s+', ' ', content).strip()
-            
-            return content[:15000]  # Limit content size
+
+            async with session.get(current_url, headers=get_headers(), timeout=10, allow_redirects=False) as response:
+                if response.status in {301, 302, 303, 307, 308}:
+                    location = response.headers.get("location")
+                    if not location:
+                        return ""
+                    current_url = urljoin(current_url, location)
+                    continue
+                if response.status != 200:
+                    return ""
+
+                content_type = response.headers.get("content-type", "").lower()
+                if "text/html" not in content_type and "text/plain" not in content_type:
+                    return ""
+
+                html_content = await response.text(errors="replace")
+                break
+        else:
+            return ""
+
+        soup = BeautifulSoup(html_content, 'html.parser')
+
+        # Remove non-content elements
+        for element in soup(["header", "footer", "nav", "aside", "form", "script", "style", "noscript", "iframe"]):
+            element.decompose()
+
+        content = soup.get_text(separator=' ')
+        content = re.sub(r'\s+', ' ', content).strip()
+
+        return content[:15000]  # Limit content size
 
     except Exception as e:
         print(f"[Fetch] Error fetching {url}: {e}")
