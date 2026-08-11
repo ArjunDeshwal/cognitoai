@@ -1,3 +1,5 @@
+
+
 # COGNITO
 
 **Local intelligence, under your control.**
@@ -99,12 +101,20 @@ A privacy-first desktop AI workspace powered by local GGUF models. Inference and
    npm ci
    ```
 
-4. **Run the app**
+4. **Start the backend server**
+   *In a separate terminal, activate the virtual environment and run the FastAPI server:*
    ```bash
+   cd backend
+   python server.py
+   ```
+
+5. **Run the app**
+   ```bash
+   cd app
    npm run electron:dev
    ```
 
-5. **Download a model**
+6. **Download a model**
    - Click "⬇️ Models" in the header
    - Browse and download a GGUF model
    - Select it to start chatting!
